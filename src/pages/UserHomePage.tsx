@@ -61,7 +61,7 @@ const UserHomePage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-12">
+      <main className="flex-grow container mx-auto px-4">
         <Hero />
         <section className="container mx-auto px-4 py-12">
           {/* <section className="container mx-auto px-4 py-12"> */}
