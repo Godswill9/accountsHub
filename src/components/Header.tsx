@@ -294,7 +294,7 @@ const Header = () => {
             <div className="hidden md:flex md:items-center md:space-x-4">
               {isAuthenticated && <WalletButton />}
               <a
-                href="#"
+                href="https://accountshubsellers.onrender.com"
                 className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center"
               >
                 Become a seller
