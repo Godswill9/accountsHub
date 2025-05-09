@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { RotatingWords } from "@/components/RotatingWords";
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,6 +30,11 @@ const Hero = () => {
             Unlock the power of premium social media accounts to elevate your
             online presence, boost your influence, and accelerate your growth.
           </p>
+
+          <div className="flex justify-center items-center gap-2 mb-4">
+            {/* <p className="text-lg sm:text-xl md:text-2xl">Featuring:</p> */}
+            <RotatingWords />
+          </div>
 
           <button
             onClick={handleViewAllAccounts}

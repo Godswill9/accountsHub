@@ -9,6 +9,7 @@ export interface Product {
   description: string;
   price: string;
   stock_quantity:number;
+  status: string;
   imageUrl?: string;
 important_notice: string;
 }
@@ -33,12 +34,14 @@ export const fetchFeaturedProducts = async (): Promise<Product[]> => {
 export const fetchAllProducts = async (): Promise<Product[]> => {
   try {
     const response = await axios.get(DIGITAL_PRODUCTS_ENDPOINTS.ALL);
-    return response.data || [];
+    const allProducts = response.data || [];
+    return allProducts.filter((product: Product) => product.status === "approved");
   } catch (error) {
     console.error('Error fetching all products:', error);
     throw error;
   }
 };
+
 
 export const fetchProductDetails = async (id: string): Promise<Product> => {
   try {
