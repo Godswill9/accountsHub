@@ -195,6 +195,12 @@ const Header = () => {
                     >
                       My Wallet
                     </Link>
+                    <Link
+                      to="/notifications"
+                      className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+                    >
+                      Notifications
+                    </Link>
 
                     <a
                       href="#"

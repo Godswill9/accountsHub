@@ -26,6 +26,7 @@ import CreateCryptoPayment from "./pages/CreateCryptoPayment";
 import "./App.css";
 import SuccessPage from "./pages/successPage";
 import ErrorPage from "./pages/error";
+import NotificationsPage from "./pages/Notifications";
 
 // Create a Client once for the entire application
 const queryClient = new QueryClient({
@@ -74,6 +75,7 @@ const App = () => (
 
               {/* Order Routes */}
               <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/create-order" element={<CreateOrderPage />} />
               <Route path="/order/:orderId" element={<OrderDetailPage />} />
               <Route path="/success" element={<SuccessPage />} />

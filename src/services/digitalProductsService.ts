@@ -12,6 +12,7 @@ export interface Product {
   status: string;
   imageUrl?: string;
 important_notice: string;
+images?: string[];
 }
 
 export const DIGITAL_PRODUCTS_ENDPOINTS = {
