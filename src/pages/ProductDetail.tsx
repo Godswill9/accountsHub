@@ -18,6 +18,7 @@ export interface PaymentDetails {
   amount: number;
   transaction_type: string;
   user_id: string;
+  ref: string;
 }
 
 // Interface for AccountDetails
@@ -29,11 +30,13 @@ export interface AccountDetails {
   seller_id: string;
   amount: number;
   buyer_email: string;
+  ref: string;
 }
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [userId, setUserId] = useState("");
+  const [sellerId, setsellerId] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [showInput, setShowInput] = useState(false); // State to toggle input visibility
   const [inputValue, setInputValue] = useState(1); // State to store the input value
@@ -110,6 +113,7 @@ const ProductDetail = () => {
   useEffect(() => {
     if (product) {
       console.log(product);
+      setsellerId(product.seller_id);
       settotalPriceValue(Number(product.price));
       document.title = `${product.platform_name} | Digital Product`;
       // fetchImages(product.images || []); // Fetch images if available
@@ -180,10 +184,12 @@ const ProductDetail = () => {
       );
 
       const data = await response.json();
-      console.log(data);
+      console.log(data.product);
 
       // Get only the first 'fileCount' number of file IDs
-      const fileIds = data.files.slice(0, fileCount).map((file) => file.id);
+      const fileIds = data.product.files
+        .slice(0, fileCount)
+        .map((file) => file.id);
       console.log(fileIds);
       if (fileIds.length === 0) {
         console.warn("No files available for download.");
@@ -211,6 +217,28 @@ const ProductDetail = () => {
     );
 
     const data = await response.json();
+  };
+
+  const createOrder = async (orderData: AccountDetails) => {
+    try {
+      const response = await fetch(
+        "https://aitool.asoroautomotive.com/api/create-order",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderData),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("order created successfuflly:", data);
+      } else {
+        console.error("❌ Error saving payment:", data.message);
+      }
+    } catch (error) {
+      console.error("❌ Network error:", error.message);
+    }
   };
 
   async function createPayment() {
@@ -258,15 +286,17 @@ const ProductDetail = () => {
             amount: Number(discountedPrice),
             transaction_type: "order",
             user_id: userId,
+            ref: "ref",
           });
           await createOrder({
             item_id: product.id,
             item_name: product.platform_name + "/" + product.category,
             quantity: inputValue,
             buyer_id: userId,
-            seller_id: "",
+            seller_id: sellerId,
             amount: Number(discountedPrice),
             buyer_email: userEmail,
+            ref: "ref",
           });
         } else {
           console.log(data2.messsage);
@@ -301,15 +331,17 @@ const ProductDetail = () => {
             amount: totalPriceValue,
             transaction_type: "order",
             user_id: userId,
+            ref: "ref",
           });
           await createOrder({
             item_id: product.id,
             item_name: product.platform_name + "/" + product.category,
             quantity: inputValue,
             buyer_id: userId,
-            seller_id: "",
+            seller_id: sellerId,
             amount: totalPriceValue,
             buyer_email: userEmail,
+            ref: "ref",
           });
         } else {
           console.log(data.messsage);
@@ -341,28 +373,6 @@ const ProductDetail = () => {
       console.error("❌ Network error:", error.message);
     }
   }
-
-  const createOrder = async (orderData: AccountDetails) => {
-    try {
-      const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/create-order",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderData),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        console.log("order created successfuflly:", data);
-      } else {
-        console.error("❌ Error saving payment:", data.message);
-      }
-    } catch (error) {
-      console.error("❌ Network error:", error.message);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
