@@ -17,6 +17,7 @@ import UserHeader from "@/components/UserHeader";
 import Footer from "@/components/Footer";
 import { PAYMENT_ENDPOINTS } from "@/config/api";
 import { useAuth } from "@/contexts/AuthContext";
+import Header from "@/components/Header";
 
 // const stripePromise = loadStripe(
 //   import.meta.env.VITE_STRIPE_PUBLIC_KEY ||
@@ -148,8 +149,8 @@ const CreateCurrencyPayment = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <UserHeader />
-
+      {/* <UserHeader /> */}
+      <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
           <Card>

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import Header from "@/components/UserHeader";
+// import Header from "@/components/UserHeader";
+import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import FeaturedProducts from "@/components/FeaturedProducts";

@@ -9,6 +9,7 @@ import { ticketService } from "@/services/ticketService";
 import { authService } from "@/services/authService";
 import ChatWindow from "@/components/chat/ChatWindow";
 import { toast } from "sonner";
+import Header from "@/components/Header";
 
 const ChatPage: React.FC = () => {
   const { ticketId } = useParams<{ ticketId: string }>();
@@ -171,8 +172,8 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <UserHeader />
-
+      {/* <UserHeader /> */}
+      <Header />
       <main className="container mx-auto px-4 py-8 flex-1 flex flex-col">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center">

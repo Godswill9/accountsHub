@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { ticketService } from "@/services/ticketService";
 import { authService } from "@/services/authService";
 import { Skeleton } from "@/components/ui/skeleton";
+import Header from "@/components/Header";
 
 interface Ticket {
   ticket_id: string;
@@ -107,9 +108,9 @@ const TicketsListPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <UserHeader />
-
-      <main className="flex-1 container mx-auto px-4 py-8">
+      {/* <UserHeader /> */}
+      <Header />
+      <main className="flex-1 w-full px-4 py-8 sm:w-11/12 sm:mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold flex items-center">
             <MessageCircle className="h-6 w-6 mr-2 text-blue-600" />

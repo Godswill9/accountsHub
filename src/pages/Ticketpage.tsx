@@ -19,6 +19,7 @@ import UserHeader from "@/components/UserHeader";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { messageService } from "@/services/messageService";
+import Header from "@/components/Header";
 
 const TicketPage: React.FC = () => {
   // User and ticket form states
@@ -156,8 +157,8 @@ const TicketPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <UserHeader />
-
+      {/* <UserHeader /> */}
+      <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold flex items-center gap-2 mb-6">

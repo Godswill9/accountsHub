@@ -22,10 +22,10 @@ const DigitalProducts = () => {
     queryFn: fetchAllProducts,
   });
 
-  useEffect(() => {
-    // Scroll to the top of the page when the component is mounted
-    window.scrollTo(0, 0);
-  }, []);
+  // useEffect(() => {
+  //   // Scroll to the top of the page when the component is mounted
+  //   window.scrollTo(0, 0);
+  // }, []);
 
   const truncateDescription = (description) => {
     const words = description.split(" ");
@@ -36,25 +36,25 @@ const DigitalProducts = () => {
   };
 
   // Updated scroll behavior
-  useEffect(() => {
-    if (location.hash) {
-      const element = document.querySelector(location.hash);
-      if (element) {
-        // Add timeout to ensure DOM is ready
-        setTimeout(() => {
-          const headerOffset = 100;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition =
-            elementPosition + window.pageYOffset - headerOffset;
+  // useEffect(() => {
+  //   if (location.hash) {
+  //     const element = document.querySelector(location.hash);
+  //     if (element) {
+  //       // Add timeout to ensure DOM is ready
+  //       setTimeout(() => {
+  //         const headerOffset = 100;
+  //         const elementPosition = element.getBoundingClientRect().top;
+  //         const offsetPosition =
+  //           elementPosition + window.pageYOffset - headerOffset;
 
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth",
-          });
-        }, 100);
-      }
-    }
-  }, [location.hash, products]);
+  //         window.scrollTo({
+  //           top: offsetPosition,
+  //           behavior: "smooth",
+  //         });
+  //       }, 100);
+  //     }
+  //   }
+  // }, [location.hash, products]);
 
   // Group products by platform
   const groupedProducts = React.useMemo(() => {

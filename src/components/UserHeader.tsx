@@ -115,7 +115,13 @@ const UserHeader = () => {
                       Home
                     </Link>
 
-                    <div className="px-4 py-2">
+                    <Link
+                      to="/digital-products"
+                      className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+                    >
+                      Social Media Accounts
+                    </Link>
+                    {/* <div className="px-4 py-2">
                       <p className="text-sm font-medium text-gray-700 mb-2">
                         Account Types
                       </p>
@@ -157,7 +163,7 @@ const UserHeader = () => {
                           TikTok
                         </a>
                       </div>
-                    </div>
+                    </div> */}
 
                     <a
                       href="#"
@@ -203,8 +209,6 @@ const UserHeader = () => {
               </Sheet>
 
               <div className="hidden md:flex md:items-center md:space-x-4 lg:space-x-8">
-                <SupportTicketButton />
-
                 <Link
                   to="/"
                   className="text-sm font-medium text-gray-700 hover:text-blue-600"
@@ -212,7 +216,14 @@ const UserHeader = () => {
                   Home
                 </Link>
 
-                <div className="relative group">
+                <Link
+                  to="/digital-products"
+                  className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+                >
+                  Social Media Accounts
+                </Link>
+
+                {/* <div className="relative group">
                   <button className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                     Account Types <ChevronDown className="ml-1 h-4 w-4" />
                   </button>
@@ -254,7 +265,8 @@ const UserHeader = () => {
                       TikTok
                     </a>
                   </div>
-                </div>
+                </div> */}
+                <SupportTicketButton />
 
                 <a
                   href="#"

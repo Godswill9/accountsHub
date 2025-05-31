@@ -65,7 +65,8 @@ const OrdersPage: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="flex-grow container mx-auto px-4 py-8">
+      {/* <main className="flex-grow container mx-auto px-4 py-8"> */}
+      <main className="flex-1 w-full px-4 py-8 sm:w-11/12 sm:mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold flex items-center mb-2">

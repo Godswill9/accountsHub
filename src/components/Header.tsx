@@ -124,51 +124,58 @@ const Header = () => {
                       Home
                     </Link>
 
-                    <div className="px-4 py-2">
+                    <Link
+                      to="/digital-products"
+                      className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+                    >
+                      Social Media Accounts
+                    </Link>
+
+                    {/* <div className="px-4 py-2">
                       <p className="text-sm font-medium text-gray-700 mb-2">
                         Account Types
                       </p>
                       <div className="ml-2 flex flex-col gap-2">
                         <a
-                          href="#"
+                          href="/digital-products"
                           className="text-sm text-gray-700 hover:text-blue-600"
                         >
-                          Instagram
+                          Digital Accounts
                         </a>
                         <a
-                          href="#"
+                          href="/digital-products#facebook"
                           className="text-sm text-gray-700 hover:text-blue-600"
                         >
                           Facebook
                         </a>
                         <a
-                          href="#"
+                          href="/digital-products#twitter"
                           className="text-sm text-gray-700 hover:text-blue-600"
                         >
                           Twitter
                         </a>
                         <a
-                          href="#"
+                          href="/digital-products#linkedin"
                           className="text-sm text-gray-700 hover:text-blue-600"
                         >
                           LinkedIn
                         </a>
                         <a
-                          href="#"
+                          href="/digital-products#gmail"
                           className="text-sm text-gray-700 hover:text-blue-600"
                         >
                           Gmail
                         </a>
                         <a
-                          href="#"
+                          href="/digital-products#tiktok"
                           className="text-sm text-gray-700 hover:text-blue-600"
                         >
                           TikTok
                         </a>
                       </div>
-                    </div>
+                    </div> */}
 
-                    <a
+                    {/* <a
                       href="#"
                       className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
                     >
@@ -180,7 +187,7 @@ const Header = () => {
                       className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
                     >
                       Terms of use
-                    </a>
+                    </a> */}
 
                     <Link
                       to="/orders"
@@ -203,7 +210,7 @@ const Header = () => {
                     </Link>
 
                     <a
-                      href="#"
+                      href="https://accountshubsellers.onrender.com"
                       className="text-sm font-medium text-purple-600 hover:text-purple-700 px-4 py-2"
                     >
                       Become a seller
@@ -221,25 +228,29 @@ const Header = () => {
               </Sheet>
 
               <div className="hidden md:flex md:items-center md:space-x-4 lg:space-x-8">
-                <SupportTicketButton />
-
                 <Link
                   to="/"
                   className="text-sm font-medium text-gray-700 hover:text-blue-600"
                 >
                   Home
                 </Link>
+                <Link
+                  to="/digital-products"
+                  className="text-sm font-medium text-gray-700 hover:text-blue-600"
+                >
+                  Social Media Accounts
+                </Link>
 
-                <div className="relative group">
+                {/* <div className="relative group">
                   <button className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                     Account Types <ChevronDown className="ml-1 h-4 w-4" />
                   </button>
                   <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
                     <Link
-                      to="/digital-products#instagram"
+                      to="/digital-products"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Instagram
+                      Digital Accounts
                     </Link>
                     <Link
                       to="/digital-products#facebook"
@@ -272,9 +283,10 @@ const Header = () => {
                       TikTok
                     </Link>
                   </div>
-                </div>
+                </div> */}
+                <SupportTicketButton />
 
-                <a
+                {/* <a
                   href="#"
                   className="text-sm font-medium text-gray-700 hover:text-blue-600"
                 >
@@ -286,7 +298,7 @@ const Header = () => {
                   className="text-sm font-medium text-gray-700 hover:text-blue-600"
                 >
                   Terms of use
-                </a>
+                </a> */}
 
                 <Link
                   to="/orders"
