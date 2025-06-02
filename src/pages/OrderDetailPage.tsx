@@ -38,6 +38,7 @@ const OrderDetailPage: React.FC = () => {
     const fetchOrderDetails = async () => {
       try {
         const data = await getOrder(orderId);
+        console.log(data)
         setOrder(data.order);
       } catch (error) {
         setError('Failed to load order details');
@@ -53,13 +54,13 @@ const OrderDetailPage: React.FC = () => {
 
     // For demo, use mock data instead of making an API call
     // In production, uncomment the fetchOrderDetails() function
-    // fetchOrderDetails();
+    fetchOrderDetails();
     
     // Mock loading delay for demo
-    setTimeout(() => {
-      setOrder(mockOrderDetail);
-      setLoading(false);
-    }, 700);
+    // setTimeout(() => {
+    //   setOrder(mockOrderDetail);
+    //   setLoading(false);
+    // }, 700);
   }, [orderId]);
 
   return (

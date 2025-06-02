@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import axios from "axios"; 
 import {
   Table,
   TableBody,
@@ -50,6 +51,16 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
     }
   };
 
+  const updateOrderSeen = async (orderId: string) => {
+  try {
+    const response = await axios.put(`https://aitool.asoroautomotive.com/api/user-order-seen/${orderId}`);
+    console.log("Order marked as seen:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error marking order as seen:", error);
+  }
+};
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -64,50 +75,58 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <TableRow key={order.order_id}>
-                <TableCell className="font-medium">{order.order_id}</TableCell>
-                <TableCell>{order.item_name}</TableCell>
-                <TableCell>
-                  {new Date(order.created_at).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={getStatusColor(order.status)}
-                  >
-                    {order.status.charAt(0).toUpperCase() +
-                      order.status.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell>${Number(order.amount).toFixed(2)}</TableCell>
-                <TableCell>{Number(order.quantity)} accounts</TableCell>
-                <TableCell className="text-right">
-                  <Link to={`/order/${order.order_id}`}>
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center py-6 text-gray-500">
-                No orders found.{" "}
-                <Link
-                  to="/create-order"
-                  className="text-blue-600 hover:underline"
-                >
-                  Create your first order
-                </Link>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+     <TableBody>
+  {orders.length > 0 ? (
+    orders.map((order) => (
+      <TableRow
+        key={order.order_id}
+        className={
+          order.seen_by_user === null
+            ? "border-l-4 border-blue-500 bg-blue-50"
+            : ""
+        }
+      >
+        <TableCell className="font-medium">{order.order_id}</TableCell>
+        <TableCell>{order.item_name}</TableCell>
+        <TableCell>
+          {new Date(order.created_at).toLocaleDateString()}
+        </TableCell>
+        <TableCell>
+          <Badge
+            variant="outline"
+            className={getStatusColor(order.status)}
+          >
+            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          </Badge>
+        </TableCell>
+        <TableCell>${Number(order.amount).toFixed(2)}</TableCell>
+        <TableCell>{Number(order.quantity)} accounts</TableCell>
+        <TableCell className="text-right">
+          <Link to={`/order/${order.order_id}`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => updateOrderSeen(order.order_id)}
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              View
+            </Button>
+          </Link>
+        </TableCell>
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+        No orders found.{" "}
+        <Link to="/create-order" className="text-blue-600 hover:underline">
+          Create your first order
+        </Link>
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
+
       </Table>
     </div>
   );

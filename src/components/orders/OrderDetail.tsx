@@ -65,27 +65,14 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center">
-              Order #{order.id}
+              Order for {order.item_name}
               <Badge variant="outline" className={`ml-3 ${getStatusColor(order.status)}`}>
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </Badge>
             </CardTitle>
-            <CardDescription>Placed on {new Date(order.date).toLocaleString()}</CardDescription>
+            <CardDescription>Placed on {new Date(order.created_at).toLocaleString()}</CardDescription>
           </div>
-          <div className="flex space-x-2">
-            {order.status === 'pending' && (
-              <>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/edit-order/${order.id}`)}>
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button variant="destructive" size="sm" onClick={handleDelete}>
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete
-                </Button>
-              </>
-            )}
-          </div>
+      
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -93,20 +80,20 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
           <div>
             <h3 className="text-sm font-medium text-gray-500">Product Information</h3>
             <div className="mt-2 border rounded-md p-3">
-              <p><span className="font-medium">Product Name:</span> {order.productName}</p>
-              <p><span className="font-medium">Product ID:</span> {order.productId}</p>
+              <p><span className="font-medium">Product Name:</span> {order.item_name}</p>
+              <p><span className="font-medium">Product ID:</span> {order.item_id}</p>
               <p><span className="font-medium">Quantity:</span> {order.quantity}</p>
             </div>
           </div>
           <div>
             <h3 className="text-sm font-medium text-gray-500">Payment Information</h3>
             <div className="mt-2 border rounded-md p-3">
-              <p><span className="font-medium">Total Amount:</span> ${order.totalAmount.toFixed(2)}</p>
+              <p><span className="font-medium">Total Amount:</span> ${Number(order.amount).toFixed(2)}</p>
               <p><span className="font-medium">Payment Method:</span> {order.paymentMethod || 'Wallet'}</p>
               <p>
                 <span className="font-medium">Payment Status:</span> 
-                <span className={order.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}>
-                  {order.status === 'completed' ? 'Paid' : 'Pending'}
+                <span className={order.status === 'pending' ? 'text-green-600' : 'text-yellow-600'}>
+                  {order.status === 'pending' ? 'Paid' : 'Pending'}
                 </span>
               </p>
             </div>
@@ -131,7 +118,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
               </div>
               <div>
                 <p className="font-medium">Order placed</p>
-                <p className="text-sm text-gray-500">{new Date(order.date).toLocaleString()}</p>
+                <p className="text-sm text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
               </div>
             </div>
             {/* Add more timeline events as needed */}
@@ -143,11 +130,11 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Orders
         </Button>
-        {order.status === 'completed' && (
+        {/* {order.status === 'completed' && (
           <Button>
             Download Receipt
           </Button>
-        )}
+        )} */}
       </CardFooter>
     </Card>
   );

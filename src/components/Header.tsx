@@ -8,12 +8,20 @@ import WalletButton from "./WalletButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
+import { getUserPayments } from '@/services/paymentService';
+import {
+  getNotifications
+} from "@/services/notificationService";
+import { getOrders } from "@/services/orderService";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  // const { isAuthenticated } = useAuth();
+  const [userId, setUserId] = useState('')
+  const [orders, setOrders] = useState([]);
+    const [payments, setPayments] = useState<Payment[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+const [notifications, setNotifications] = useState([]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +38,11 @@ const Header = () => {
           return null;
         } else {
           setIsAuthenticated(true);
+          setUserId(response.id)
+          fetchNotifications(response.id)
+          fetchOrders(response.id)
+          fetchPayments(response.id)
+          console.log(response)
         }
       } catch (error) {
         console.error("Authentication error", error);
@@ -39,6 +52,43 @@ const Header = () => {
 
     checkAuthStatus();
   }, []);
+
+ const fetchNotifications = async (id) => {
+  try {
+    const data = await getNotifications(id);
+    const unseen = (data || []).filter(item => item.seen_by_user === null);
+    setNotifications(unseen);
+    console.log(unseen);
+  } catch (error) {
+    // handle error
+  }
+};
+
+
+   const fetchOrders = async (id: string) => {
+  try {
+    const data = await getOrders(id);
+    const unseenOrders = (data.order || []).filter(item => item.seen_by_user === null);
+    setOrders(unseenOrders);
+    console.log(unseenOrders);
+  } catch (error) {
+    // handle error
+  }
+};
+
+
+
+ const fetchPayments = async (id) => {
+  try {
+    const response = await getUserPayments(id);
+    const unseenPayments = (response.payments || []).filter(item => item.seen_by_user === null);
+    setPayments(unseenPayments);
+    console.log(unseenPayments);
+  } catch (error) {
+    // handle error
+  }
+};
+
 
   return (
     <header className="w-full bg-white shadow-sm">
@@ -108,6 +158,8 @@ const Header = () => {
                 />
               </Link>
 
+
+{/* Mobile view */}
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="md:hidden">
@@ -189,25 +241,50 @@ const Header = () => {
                       Terms of use
                     </a> */}
 
-                    <Link
-                      to="/orders"
-                      className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
-                    >
-                      My Orders
-                    </Link>
+<Link
+  to="/wallet"
+  className="relative text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+>
+  My Wallet
+</Link>
 
-                    <Link
-                      to="/wallet"
-                      className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
-                    >
-                      My Wallet
-                    </Link>
-                    <Link
-                      to="/notifications"
-                      className="text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
-                    >
-                      Notifications
-                    </Link>
+    <Link
+  to="/orders"
+  className="relative text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+>
+  My Orders
+  {orders?.length > 0 && (
+    <span className="absolute top-3 right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+      {orders.length}
+    </span>
+  )}
+</Link>
+
+<Link
+  to="/notifications"
+  className="relative text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+>
+  Notifications
+  {notifications?.length > 0 && (
+    <span className="absolute top-3 right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+      {notifications.length}
+    </span>
+  )}
+</Link>
+
+<Link
+  to="/payment-history"
+  className="relative text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
+>
+  Payment History
+  {payments?.length > 0 && (
+    <span className="absolute top-3 right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+      {payments.length}
+    </span>
+  )}
+</Link>
+
+
 
                     <a
                       href="https://accountshubsellers.onrender.com"
@@ -227,6 +304,7 @@ const Header = () => {
                 </SheetContent>
               </Sheet>
 
+{/* pc view */}
               <div className="hidden md:flex md:items-center md:space-x-4 lg:space-x-8">
                 <Link
                   to="/"
@@ -299,13 +377,43 @@ const Header = () => {
                 >
                   Terms of use
                 </a> */}
+<Link
+  to="/orders"
+  className="relative text-sm font-medium text-gray-700 hover:text-blue-600"
+>
+  My Orders
+  {orders?.length > 0 && (
+    <span className="absolute -top-1 -right-5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+      {orders.length}
+    </span>
+  )}
+</Link>
 
-                <Link
-                  to="/orders"
-                  className="text-sm font-medium text-gray-700 hover:text-blue-600"
-                >
-                  My Orders
-                </Link>
+<Link
+  to="/payment-history"
+  className="relative text-sm font-medium text-gray-700 hover:text-blue-600"
+>
+  Payment History
+  {payments?.length > 0 && (
+    <span className="absolute -top-1 -right-5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+      {payments.length}
+    </span>
+  )}
+</Link>
+
+<Link
+  to="/notifications"
+  className="relative text-sm font-medium text-gray-700 hover:text-blue-600"
+>
+  Notifications
+  {notifications?.length > 0 && (
+    <span className="absolute -top-1 -right-5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+      {notifications.length}
+    </span>
+  )}
+</Link>
+
+
               </div>
             </div>
 
