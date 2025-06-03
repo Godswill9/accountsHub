@@ -71,7 +71,7 @@ const SignupForm = () => {
       }
 
       try {
-        await signup(name, email, password, "");
+        await signup(name, email, password, "code");
         toast({
           title: "Success",
           description: "Signup successful. Please verify your email.",
