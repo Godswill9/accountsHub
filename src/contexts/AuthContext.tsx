@@ -14,10 +14,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   checkAuthStatus?: () => Promise<any>;
   signup: (
-    name: string,
+    fullName: string,
     email: string,
     password: string,
-    code: string
+    code: string,
+    country:string,
+    phoneNumber:Number
   ) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
@@ -82,18 +84,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const signup = async (
-    name: string,
+       fullName: string,
     email: string,
     password: string,
-    code: string
+    code: string,
+    country:string,
+    phoneNumber:string
   ) => {
     setIsLoading(true);
     try {
       const response = await authService.signup({
-        name,
+        fullName,
         email,
         password,
         code,
+        country,
+        phoneNumber
       });
       toast({
         title: "Success",

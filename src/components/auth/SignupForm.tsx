@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Globe, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/authService";
 
@@ -17,6 +17,8 @@ const SignupForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [country, setCountry] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -52,7 +54,7 @@ const SignupForm = () => {
     event.preventDefault();
     if (!verificationStep) {
       // Step 1: Register user
-      if (!name || !email || !password || !confirmPassword) {
+      if (!name || !email || !password || !confirmPassword || !country || !phoneNumber) {
         toast({
           title: "Error",
           description: "Please fill in all fields",
@@ -71,21 +73,32 @@ const SignupForm = () => {
       }
 
       try {
-        await signup(name, email, password, "code");
-        toast({
-          title: "Success",
-          description: "Signup successful. Please verify your email.",
-          variant: "success",
-        });
-        setVerificationStep(true);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error.message || "Signup failed",
-          variant: "destructive",
-        });
-        console.error("Signup error:", error);
-      }
+  const data = await signup(name, email, password, "code", country, phoneNumber);
+
+  if (data.message !== "User registered and email sent") {
+     toast({
+      title: "Error",
+      description: data.message,
+      variant: "destructive",
+    })
+    return;
+  } else {
+    toast({
+      title: "Success",
+      description: "Signup successful. Please verify your email.",
+      variant: "success",
+    });
+    setVerificationStep(true);
+  }
+} catch (error) {
+  toast({
+    title: "Error",
+    description: error.message || "Signup failed",
+    variant: "destructive",
+  });
+  console.error("Signup error:", error);
+}
+
     } else {
       // Step 2: Verify email with code
       if (!code) {
@@ -136,21 +149,56 @@ const SignupForm = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Mail className="h-4 w-4 text-gray-500" />
-              </div>
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-10"
-                required
-              />
-            </div>
-          </div>
+      <div className="space-y-2">
+  {/* Email input */}
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      <Mail className="h-4 w-4 text-gray-500" />
+    </div>
+    <Input
+      type="email"
+      placeholder="Email"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      className="pl-10"
+      required
+    />
+  </div>
+
+  {/* Country input */}
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      {/* Consider using a different icon like a Globe */}
+      <Globe className="h-4 w-4 text-gray-500" />
+    </div>
+    <Input
+      id="country"
+      type="text"
+      placeholder="Country"
+      value={country}
+      onChange={(e) => setCountry(e.target.value)}
+      className="pl-10"
+      required
+    />
+  </div>
+
+  {/* Phone number input */}
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      {/* Consider using a Phone icon */}
+      <Phone className="h-4 w-4 text-gray-500" />
+    </div>
+    <Input
+      id="phoneNumber"
+      type="tel"
+      placeholder="Phone Number"
+      value={phoneNumber}
+      onChange={(e) => setPhoneNumber(e.target.value)}
+      className="pl-10"
+      required
+    />
+  </div>
+</div>
 
           <div className="space-y-2">
             <div className="relative">
