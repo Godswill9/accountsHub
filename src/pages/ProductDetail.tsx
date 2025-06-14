@@ -112,7 +112,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (product) {
-      console.log(product);
+      // console.log(product);
       setsellerId(product.seller_id);
       settotalPriceValue(Number(product.price));
       document.title = `${product.platform_name} | Digital Product`;
@@ -175,7 +175,7 @@ const ProductDetail = () => {
   async function downloadfetchAcc(fileCount: Number) {
     try {
       const response = await fetch(
-        `https://aitool.asoroautomotive.com/api/digital-products/${id}`,
+        `https://aitool.asoroautomotive.com/api/digital-products-FS/${id}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -184,7 +184,7 @@ const ProductDetail = () => {
       );
 
       const data = await response.json();
-      console.log(data.product);
+      // console.log(data.product);
 
       // Get only the first 'fileCount' number of file IDs
       const fileIds = data.product.files
