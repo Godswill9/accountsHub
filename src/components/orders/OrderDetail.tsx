@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { deleteOrder } from '@/services/orderService';
 import { toast } from '@/hooks/use-toast';
-import { ArrowLeft, Clock, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Clock, Edit, MessageCircle, Trash2 } from 'lucide-react';
 
 interface OrderDetailProps {
   order: {
@@ -19,6 +19,10 @@ interface OrderDetailProps {
     totalAmount: number;
     notes?: string;
     paymentMethod?: string;
+    created_at: string;
+    item_name: string;
+    item_id: string;
+    amount: string;
   };
 }
 
@@ -125,17 +129,23 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={() => navigate('/orders')}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Orders
-        </Button>
-        {/* {order.status === 'completed' && (
-          <Button>
-            Download Receipt
-          </Button>
-        )} */}
-      </CardFooter>
+<CardFooter className="flex flex-col lg:flex-row justify-between items-center gap-4 w-full">
+  <Button variant="outline" onClick={() => navigate('/orders')} className="w-full lg:w-auto">
+    <ArrowLeft className="h-4 w-4 mr-2" />
+    Back to Orders
+  </Button>
+
+  <div className="flex flex-col items-center text-center lg:text-left lg:items-start gap-2 w-full lg:w-auto">
+    <p className="text-sm text-muted-foreground">
+      Have a complaint? Reach out to the seller directly:
+    </p>
+    <Button variant="outline" onClick={() => navigate('/orders')}>
+      <MessageCircle className="h-4 w-4 mr-2" />
+      Message Seller
+    </Button>
+  </div>
+</CardFooter>
+
     </Card>
   );
 };

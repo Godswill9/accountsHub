@@ -314,10 +314,10 @@ const WalletPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold flex items-center mb-2">
+<main className="flex-grow w-full px-4 py-8">
+  <div className="w-full lg:container lg:mx-auto lg:max-w-screen-lg">
+    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+  <h1 className="text-2xl font-bold flex items-center mb-2">
             <Wallet className="h-6 w-6 mr-2 text-blue-600" />
             My Wallet
           </h1>
@@ -538,6 +538,7 @@ const WalletPage: React.FC = () => {
             </Tabs>
           </>
         )}
+        </div>
       </main>
 
       <Footer />

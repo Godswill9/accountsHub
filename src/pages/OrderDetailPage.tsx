@@ -7,19 +7,6 @@ import OrderDetail from '@/components/orders/OrderDetail';
 import { getOrder } from '@/services/orderService';
 import { toast } from '@/hooks/use-toast';
 
-// Mock order detail
-const mockOrderDetail = {
-  id: 'ORD-1234',
-  productName: 'Instagram Account (10K Followers)',
-  productId: 'PROD-5678',
-  quantity: 1,
-  date: '2023-05-20T14:30:00',
-  status: 'completed' as const,
-  totalAmount: 99.99,
-  notes: 'Please ensure the account has posts related to travel niche.',
-  paymentMethod: 'Wallet'
-};
-
 const OrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<any>(null);
