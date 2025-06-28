@@ -11,14 +11,14 @@ import ChatWindow from "@/components/chat/ChatWindow";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 
-const ChatPage: React.FC = () => {
-  const { ticketId } = useParams<{ ticketId: string }>();
+const OrderChatPage: React.FC = () => {
+  const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [ticketSubject, setTicketSubject] = useState("Support Ticket");
+  const [orderSubject, setorderSubject] = useState("Order");
 
   // Check authentication only once when page loads
   useEffect(() => {
@@ -41,85 +41,85 @@ const ChatPage: React.FC = () => {
     checkAuthStatus();
   }, [navigate]);
 
-  // Load messages when both ticketId and userId are ready
-  useEffect(() => {
-    if (!ticketId || !userId) return; // Do not proceed if ticketId or userId is not available
+  // Load messages when both orderId and userId are ready
+//   useEffect(() => {
+//     if (!orderId || !userId) return; // Do not proceed if orderId or userId is not available
 
-    const loadMessages = async () => {
-      try {
-        setIsLoading(true);
+//     const loadMessages = async () => {
+//       try {
+//         setIsLoading(true);
 
-        // Fetch ticket subject
-        const ticket = await ticketService.getTicket(ticketId);
-        if (ticket) {
-          setTicketSubject(ticket.subject);
-        }
+//         // Fetch ticket subject
+//         const ticket = await ticketService.getTicket(orderId);
+//         if (ticket) {
+//           setorderSubject(ticket.subject);
+//         }
  
-        // Fetch initial messages
-        const fetchedMessages = await messageService.fetchMessages({
-          ticket_id: ticketId,
-        });
+//         // Fetch initial messages
+//         const fetchedMessages = await messageService.fetchMessages({
+//           ticket_id: orderId,
+//         });
 
-        if (fetchedMessages.length === 0) {
-          toast.info("No messages found for this ticket.");
-        }
-        setMessages(fetchedMessages);
+//         if (fetchedMessages.length === 0) {
+//           toast.info("No messages found for this ticket.");
+//         }
+//         setMessages(fetchedMessages);
 
-        // Mark unread admin messages as seen
-        fetchedMessages.forEach((msg) => {
-          if (
-            (msg.seen_by_user === 0 || msg.seen === false) &&
-            (msg.sender_id === "admin" || msg.sender === "admin")
-          ) {
-            messageService.markAsSeen(msg.id);
-          }
-        });
-      } catch (error) {
-        console.error("Error loading messages:", error);
-        toast.error("Failed to load messages");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+//         // Mark unread admin messages as seen
+//         fetchedMessages.forEach((msg) => {
+//           if (
+//             (msg.seen_by_user === 0 || msg.seen === false) &&
+//             (msg.sender_id === "admin" || msg.sender === "admin")
+//           ) {
+//             messageService.markAsSeen(msg.id);
+//           }
+//         });
+//       } catch (error) {
+//         console.error("Error loading messages:", error);
+//         toast.error("Failed to load messages");
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
 
-    loadMessages();
-  }, [ticketId, userId]); // This will run only when both `ticketId` and `userId` are available
+//     loadMessages();
+//   }, [orderId, userId]); // This will run only when both `orderId` and `userId` are available
 
-  // Poll for new messages every 30 seconds only when both ticketId and userId are ready
-  useEffect(() => {
-    if (!ticketId || !userId) return; // Prevent polling if ticketId or userId are not available
+  // Poll for new messages every 30 seconds only when both orderId and userId are ready
+//   useEffect(() => {
+//     if (!orderId || !userId) return; // Prevent polling if orderId or userId are not available
 
-    const interval = setInterval(async () => {
-      try {
-        const fetchedMessages = await messageService.fetchMessages({
-          ticket_id: ticketId,
-        });
-        setMessages(fetchedMessages);
+//     const interval = setInterval(async () => {
+//       try {
+//         const fetchedMessages = await messageService.fetchMessages({
+//           ticket_id: orderId,
+//         });
+//         setMessages(fetchedMessages);
 
-        // Mark unread admin messages as seen
-        fetchedMessages.forEach((msg) => {
-          if (
-            (msg.seen_by_user === 0 || msg.seen === false) &&
-            (msg.sender_id === "admin" || msg.sender === "admin")
-          ) {
-            messageService.markAsSeen(msg.id);
-          }
-        });
-      } catch (error) {
-        console.error("Error polling messages:", error);
-      }
-    }, 30000);
+//         // Mark unread admin messages as seen
+//         fetchedMessages.forEach((msg) => {
+//           if (
+//             (msg.seen_by_user === 0 || msg.seen === false) &&
+//             (msg.sender_id === "admin" || msg.sender === "admin")
+//           ) {
+//             messageService.markAsSeen(msg.id);
+//           }
+//         });
+//       } catch (error) {
+//         console.error("Error polling messages:", error);
+//       }
+//     }, 30000);
 
-    return () => clearInterval(interval); // Clean up interval on unmount
-  }, [ticketId, userId]); // This will run only when both `ticketId` and `userId` are available
+//     return () => clearInterval(interval); // Clean up interval on unmount
+//   }, [orderId, userId]); // This will run only when both `orderId` and `userId` are available
 
   const handleSendMessage = async (content: string, type: string = "text") => {
-    if (!ticketId || !content.trim() || !userId) return;
+    if (!orderId || !content.trim() || !userId) return;
     setIsSending(true);
     try {
       const sentMessage = await messageService.sendMessage({
         message: content.trim(),
-        ticket_id: ticketId,
+        ticket_id: orderId,
         message_type: type,
         sender_id: userId,
         admin_id: "admin",
@@ -139,13 +139,13 @@ const ChatPage: React.FC = () => {
     files: File[],
     type: string = "file"
   ) => {
-    if (!ticketId || files.length === 0 || !userId) return;
+    if (!orderId || files.length === 0 || !userId) return;
     setIsSending(true);
     // console.log(files)
     try {
       const sentMessage = await messageService.sendMessage({
         message: content,
-        ticket_id: ticketId,
+        ticket_id: orderId,
         message_type: type,
         sender_id: userId,
         admin_id: "admin",
@@ -155,7 +155,7 @@ const ChatPage: React.FC = () => {
 
       // Refresh the messages list to show the new files
       const fetchedMessages = await messageService.fetchMessages({
-        ticket_id: ticketId,
+        ticket_id: orderId,
       });
       setMessages(fetchedMessages);
     } catch (error) {
@@ -176,13 +176,13 @@ const ChatPage: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/tickets")}
+              onClick={() => navigate("/orders")}
               className="mr-2"
             >
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
             </Button>
             <h1 className="text-xl font-bold">
-              {ticketSubject.toLocaleUpperCase()}
+              {orderSubject.toLocaleUpperCase()}
             </h1>
           </div>
         </div>
@@ -204,4 +204,4 @@ const ChatPage: React.FC = () => {
   );
 };
 
-export default ChatPage;
+export default OrderChatPage;

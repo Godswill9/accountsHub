@@ -54,12 +54,19 @@ const TicketsListPage: React.FC = () => {
           console.log(response);
           setUserId(response.id);
           const userTickets = await ticketService.getUserTickets(response.id);
-          if (userTickets.message === "Tickets not found.") {
-            toast.error("No tickets found.");
-            setTickets([]);
-          }
+          // if (userTickets.message === "Tickets not found.") {
+          //   toast.error("No tickets found.");
+          //   setTickets([]);
+          // }
+
+          if (Array.isArray(userTickets)) {
+  setTickets(userTickets);
+} else {
+  toast.error("No tickets found.");
+  setTickets([]);
+}
           // console.log(userTickets);
-          setTickets(userTickets);
+          // setTickets(userTickets);
         }
       } catch (error) {
         console.error("Authentication error", error);

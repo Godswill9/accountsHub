@@ -27,6 +27,7 @@ import "./App.css";
 import SuccessPage from "./pages/successPage";
 import ErrorPage from "./pages/error";
 import NotificationsPage from "./pages/Notifications";
+import OrderChatPage from "./pages/OrderChat";
 
 // Create a Client once for the entire application
 const queryClient = new QueryClient({
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="/ticket" element={<TicketPage />} />
               <Route path="/tickets" element={<TicketsListPage />} />
               <Route path="/chat/:ticketId" element={<ChatPage />} />
+              <Route path="/conversation/:orderId" element={<OrderChatPage/>} />
 
               {/* Wallet Routes */}
               <Route path="/wallet" element={<WalletPage />} />

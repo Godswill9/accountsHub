@@ -6,11 +6,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { deleteOrder } from '@/services/orderService';
 import { toast } from '@/hooks/use-toast';
-import { ArrowLeft, Clock, Edit, MessageCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Clock, CloudCog, Edit, MessageCircle, Trash2 } from 'lucide-react';
 
 interface OrderDetailProps {
   order: {
-    id: string;
+    order_id: string;
     productName: string;
     productId: string;
     quantity: number;
@@ -47,10 +47,10 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this order?')) {
       try {
-        await deleteOrder(order.id);
+        await deleteOrder(order.order_id);
         toast({
           title: "Order deleted",
-          description: `Order #${order.id} has been deleted successfully.`,
+          description: `Order #${order.order_id} has been deleted successfully.`,
         });
         navigate('/orders');
       } catch (error) {
@@ -139,7 +139,9 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
     <p className="text-sm text-muted-foreground">
       Have a complaint? Reach out to the seller directly:
     </p>
-    <Button variant="outline" onClick={() => navigate('/orders')}>
+    <Button variant="outline" onClick={() =>{
+      navigate(`/conversation/${order.order_id}`)
+    }} className="w-full lg:w-auto">
       <MessageCircle className="h-4 w-4 mr-2" />
       Message Seller
     </Button>

@@ -21,6 +21,7 @@ interface Order {
   order_id: string;
   quantity: number;
   status: string;
+  seen_by_user: string;
 }
 // interface Order {
 //   id: string;
@@ -119,9 +120,9 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
     <TableRow>
       <TableCell colSpan={7} className="text-center py-6 text-gray-500">
         No orders found.{" "}
-        <Link to="/create-order" className="text-blue-600 hover:underline">
+        {/* <Link to="/create-order" className="text-blue-600 hover:underline">
           Create your first order
-        </Link>
+        </Link> */}
       </TableCell>
     </TableRow>
   )}

@@ -19,7 +19,7 @@ interface AuthContextType {
     password: string,
     code: string,
     country:string,
-    phoneNumber:Number
+    phoneNumber:string
   ) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
@@ -43,14 +43,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const { toast } = useToast();
 
-  const handleSessionExpiry = () => {
-    toast({
-      title: "Session Expired",
-      description: "Please log in again.",
-      variant: "warning",
-    });
-    logout();
-  };
+  // const handleSessionExpiry = () => {
+  //   toast({
+  //     title: "Session Expired",
+  //     description: "Please log in again.",
+  //     variant: "warning",
+  //   });
+  //   logout();
+  // };
 
   // const checkAuthStatus = async (): Promise<any> => {
   //   try {
@@ -71,17 +71,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   //     setIsLoading(false);
   //   }
   // };
-  useEffect(() => {
-    // checkAuthStatus();
-    const tokenExpiryCheck = setInterval(() => {
-      const token = localStorage.getItem("authToken");
-      if (token && isTokenExpired(token)) {
-        handleSessionExpiry();
-      }
-    }, 60000); // Check every minute
+  // useEffect(() => {
+  //   // checkAuthStatus();
+  //   const tokenExpiryCheck = setInterval(() => {
+  //     const token = localStorage.getItem("authToken");
+  //     if (token && isTokenExpired(token)) {
+  //       handleSessionExpiry();
+  //     }
+  //   }, 60000); // Check every minute
 
-    return () => clearInterval(tokenExpiryCheck);
-  }, []);
+  //   return () => clearInterval(tokenExpiryCheck);
+  // }, []);
 
   const signup = async (
        fullName: string,
@@ -170,7 +170,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = async () => {
     setIsLoading(true);
     try {
-      await authService.logout();
+       const response = await authService.logout();
+       console.log(response)
       setUser(null);
       setIsAuthenticated(false);
       toast({

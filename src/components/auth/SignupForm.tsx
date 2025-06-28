@@ -10,7 +10,8 @@ import { authService } from "@/services/authService";
 interface AuthResponse {
   id: string;
   email: string;
-  name?: string; // Add other fields if needed
+  name?: string;
+  messsage:string; // Add other fields if needed
 }
 
 const SignupForm = () => {
@@ -72,24 +73,35 @@ const SignupForm = () => {
         return;
       }
 
-      try {
+ try {
   const data = await signup(name, email, password, "code", country, phoneNumber);
 
-  if (data.message !== "User registered and email sent") {
-     toast({
-      title: "Error",
-      description: data.message,
-      variant: "destructive",
-    })
-    return;
-  } else {
+  if (data.message === "User already exists but not verified. Verify your email") {
     toast({
-      title: "Success",
-      description: "Signup successful. Please verify your email.",
+      title: "Notice",
+      description: "User already exists but not verified. Check your email for the code.",
       variant: "success",
     });
     setVerificationStep(true);
+    return;
   }
+
+  if (data.message === "User registered and email sent") {
+    toast({
+      title: "Success",
+      description: "Signup successful. Check your email for the code.",
+      variant: "success",
+    });
+    setVerificationStep(true);
+    return;
+  }
+
+  // Catch-all fallback for unexpected messages
+  toast({
+    title: "Error",
+    description: data.message || "Signup failed unexpectedly",
+    variant: "destructive",
+  });
 } catch (error) {
   toast({
     title: "Error",
@@ -109,22 +121,24 @@ const SignupForm = () => {
         });
         return;
       }
+try {
+  await verifyCode(email, code);
+  toast({
+    title: "Success",
+    description: "Your account has been verified.",
+  });
 
-      try {
-        await verifyCode(email, code);
-        toast({
-          title: "Success",
-          description: "Your account has been verified.",
-        });
-        navigate("/");
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error.message || "Verification failed",
-          variant: "destructive",
-        });
-        console.error("Verification error:", error);
-      }
+  // ✅ Add a short delay (optional UX polish)
+  setTimeout(() => navigate("/"), 1000);
+} catch (error) {
+  toast({
+    title: "Error",
+    description: error.message || "Verification failed",
+    variant: "destructive",
+  });
+  console.error("Verification error:", error);
+}
+
     }
   };
 

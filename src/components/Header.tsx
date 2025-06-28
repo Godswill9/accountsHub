@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, User, ChevronDown, Menu, Globe, Flag, X } from "lucide-react";
+import { Search, User, ChevronDown, Menu, Globe, Flag, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import SupportTicketButton from "./SupportTicketButton";
@@ -19,7 +19,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState('')
   const [orders, setOrders] = useState([]);
-    const [payments, setPayments] = useState<Payment[]>([]);
+    const [payments, setPayments] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 const [notifications, setNotifications] = useState([]);
 
@@ -52,6 +52,16 @@ const [notifications, setNotifications] = useState([]);
 
     checkAuthStatus();
   }, []);
+
+  const logout = async () =>{
+    try {
+      await authService.logout();
+      setIsAuthenticated(false);
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+  }
 
  const fetchNotifications = async (id) => {
   try {
@@ -96,7 +106,7 @@ const [notifications, setNotifications] = useState([]);
       <div className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white py-3">
         <div className="container mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
           <div className="text-sm truncate max-w-[200px] sm:max-w-none">
-            <span>Accounts Hub - Social Media Accounts Store</span>
+            <span>AccountsHub - Users</span>
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -126,8 +136,23 @@ const [notifications, setNotifications] = useState([]);
                 </Link>
               </div>
             )}
+          {isAuthenticated && (
+  <div className="flex items-center space-x-3">
+    <Button
+      size="sm"
+      variant="ghost"
+      className="text-white hover:bg-white/10 border border-white/20 rounded-lg px-4 py-1 transition-all duration-200"
+      onClick={()=>logout()}
+    >
+      <LogOut className="h-4 w-4 mr-2" />
+      <span className="text-sm">Logout</span>
+    </Button>
+  </div>
+)}
 
-            <div className="flex items-center space-x-2">
+
+
+            {/* <div className="flex items-center space-x-2">
               <a href="#" className="flex items-center">
                 <Flag className="h-4 w-4" />
                 <span className="text-sm hidden sm:inline ml-1">Eng</span>
@@ -136,7 +161,7 @@ const [notifications, setNotifications] = useState([]);
                 <Globe className="h-4 w-4" />
                 <span className="text-sm hidden sm:inline ml-1">Рус</span>
               </a>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -149,12 +174,12 @@ const [notifications, setNotifications] = useState([]);
             style={{ height: "50px" }}
           >
             <div className="flex items-center">
-              <Link to="/" className="flex items-center text-blue-900 mr-4">
+              <Link to="/" className="flex items-center text-blue-900 mr-4 h-12">
                 <img
                   src="/lovable-uploads\b8bc2363-f8b3-49a4-bec6-1490e3aa106a-removebg-preview.png"
                   alt="Accounts Hub Logo"
                   className="w-auto mr-2"
-                  style={{ height: "150px" }}
+                  style={{ height: "120px" }}
                 />
               </Link>
 
@@ -241,12 +266,15 @@ const [notifications, setNotifications] = useState([]);
                       Terms of use
                     </a> */}
 
-<Link
+{isAuthenticated && (
+  <div className="flex flex-col gap-2">
+
+ {/* <Link
   to="/wallet"
   className="relative text-sm font-medium text-gray-700 hover:text-blue-600 px-4 py-2"
 >
   My Wallet
-</Link>
+</Link> */}
 
     <Link
   to="/orders"
@@ -282,16 +310,16 @@ const [notifications, setNotifications] = useState([]);
       {payments.length}
     </span>
   )}
-</Link>
-
-
-
+</Link> 
+  </div>
+)}
                     <a
                       href="https://accountshubsellers.onrender.com"
                       className="text-sm font-medium text-purple-600 hover:text-purple-700 px-4 py-2"
                     >
                       Become a seller
                     </a>
+                    
 
                     {!isAuthenticated && (
                       <Link to="/signup" className="md:hidden px-4 py-2">
@@ -362,21 +390,10 @@ const [notifications, setNotifications] = useState([]);
                     </Link>
                   </div>
                 </div> */}
-                <SupportTicketButton />
 
-                {/* <a
-                  href="#"
-                  className="text-sm font-medium text-gray-700 hover:text-blue-600"
-                >
-                  FAQ
-                </a>
-
-                <a
-                  href="#"
-                  className="text-sm font-medium text-gray-700 hover:text-blue-600"
-                >
-                  Terms of use
-                </a> */}
+                    {isAuthenticated && (
+    <div className="hidden md:flex md:items-center md:space-x-8">
+           <SupportTicketButton />
 <Link
   to="/orders"
   className="relative text-sm font-medium text-gray-700 hover:text-blue-600"
@@ -413,7 +430,8 @@ const [notifications, setNotifications] = useState([]);
   )}
 </Link>
 
-
+  </div>
+)}
               </div>
             </div>
 
@@ -426,7 +444,6 @@ const [notifications, setNotifications] = useState([]);
                 Become a seller
               </a>
             </div>
-
             <div className="md:hidden flex items-center space-x-2">
               {isAuthenticated && <WalletButton />}
               <SupportTicketButton />

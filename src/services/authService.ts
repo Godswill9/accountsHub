@@ -1,10 +1,12 @@
 import { AUTH_ENDPOINTS } from '@/config/api';
 
 interface SignupData {
-  name: string;
+   fullName: string;
   email: string;
   password: string;
   code:string;
+  phoneNumber: string;
+  country: string;
 }
 
 interface LoginData {

@@ -9,7 +9,8 @@ import { authService } from "@/services/authService";
 interface AuthResponse {
   id: string;
   email: string;
-  name?: string; // Add other fields if needed
+  name?: string; 
+  message:string;// Add other fields if needed
 }
 
 const LoginForm = () => {
@@ -56,20 +57,9 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/user-login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email, password }),
-        }
-      );
-
-      const data = await response.json();
-
+      const response: AuthResponse = await authService.login({ email, password });
       // Check for success or error messages
-      if (response.ok && data.redirect === "true") {
+      if (response.email) {
         toast({
           title: "Success",
           description: "Logged in successfully.",
@@ -80,19 +70,19 @@ const LoginForm = () => {
         setTimeout(() => {
           navigate("/"); // Adjust this route if needed
         }, 2000);
-      } else if (data.message === "incorrect password") {
+      } else if (response.message === "incorrect password") {
         toast({
           title: "Error",
           description: "Invalid email or password. Please try again.",
           variant: "destructive",
         });
-      } else if (data.message === "user not found") {
+      } else if (response.message === "user not found") {
         toast({
           title: "Error",
           description: "No account found with this email. Please sign up.",
           variant: "destructive",
         });
-      } else if (data.message === "Account locked") {
+      } else if (response.message === "Account locked") {
         toast({
           title: "Error",
           description: "Your account is locked. Please contact support.",
@@ -101,7 +91,7 @@ const LoginForm = () => {
       } else {
         toast({
           title: "Error",
-          description: data.message || "Login failed. Please try again.",
+          description: response.message || "Login failed. Please try again.",
           variant: "destructive",
         });
       }

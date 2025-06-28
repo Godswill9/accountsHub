@@ -1,5 +1,6 @@
 
 import { MESSAGE_ENDPOINTS, FILE_ENDPOINTS } from '@/config/api';
+import { CloudCog } from 'lucide-react';
 import { toast } from "sonner";
 
 export interface Message {
@@ -76,7 +77,7 @@ const apiRequest = async (url: string, method: string, data?: any) => {
 };
 
 // File upload service
-export const uploadFiles = async (
+export const uploadFiles = async ( 
   files: File[],
   senderId: string,
   receiverId: string,
@@ -94,6 +95,7 @@ export const uploadFiles = async (
     // formData.append("fileMessage", message);
 
     const response = await apiRequest(FILE_ENDPOINTS.UPLOAD, "POST", formData);
+    console.log(response)
     return response.fileUrls;
   } catch (error) {
     console.error("File upload error:", error);
@@ -105,38 +107,31 @@ export const uploadFiles = async (
 // Message service functions
 export const messageService = {
   sendMessage: async ({message, ticket_id, message_type, sender_id, admin_id, attachments }: SendMessageParams): Promise<Message> => {
-    try {
-      // Upload files first if any
-      let fileUrls: string[] = [];
-      if (attachments && attachments.length > 0) {
-        fileUrls = await uploadFiles(attachments, sender_id, admin_id, ticket_id);
-        return;
-      }else if (attachments && attachments.length > 0 && message !=="") {
-        fileUrls = await uploadFiles(attachments, sender_id, admin_id, ticket_id);
-        const response = await apiRequest(MESSAGE_ENDPOINTS.SEND_USER, 'POST', {
-          message, 
-          ticket_id, 
-          message_type, 
-          sender_id,
-          admin_id,
-          attachments: fileUrls
-        });
-        return response.message; 
-      }else{
-        const response = await apiRequest(MESSAGE_ENDPOINTS.SEND_USER, 'POST', {
-          message, 
-          ticket_id, 
-          message_type, 
-          sender_id,
-          admin_id,
-          attachments: fileUrls
-        });
-        return response.message; 
-      }
-    } catch (error) {
-      toast.error("Failed to send message");
-      throw error;
-    }
+  try {
+  let fileUrls: string[] = [];
+
+  // Upload files first if there are any
+  if (attachments && attachments.length > 0) {
+    fileUrls = await uploadFiles(attachments, sender_id, admin_id, ticket_id);
+  }
+
+  // Send the message (with or without attachments)
+  const response = await apiRequest(MESSAGE_ENDPOINTS.SEND_USER, 'POST', {
+    message, 
+    ticket_id, 
+    message_type, 
+    sender_id,
+    admin_id,
+    attachments: fileUrls,
+  });
+
+  return response.message;
+
+} catch (error) {
+  toast.error("Failed to send message");
+  throw error;
+}
+
   },
   
   fetchMessages: async ({ ticket_id }: FetchMessagesParams): Promise<Message[]> => {
