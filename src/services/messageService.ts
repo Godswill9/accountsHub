@@ -5,19 +5,26 @@ import { toast } from "sonner";
 
 export interface Message {
   id: string;
+  message_id?: string;
   message: string;
   content?: string; // Add content as an alias for message
-  ticket_id: string;
-  message_type: string;
+  ticket_id?: string;
+  message_type?: string;
   sender_id: string;
   sender?: string; // Add sender as an alias for sender_id
   admin_id: string;
   time_received: string;
   timestamp?: string; // Add timestamp as an alias for time_received
-  seen_by_admin: number;
+  seen_by_admin?: number;
   seen_by_user: number;
+  seen_by_receiver?:number;
+  sent_at?:string;
+  sender_role?: string; // Add sender_role to differentiate between user and admin
   seen?: boolean; // Add seen as an alias for seen_by_user
   attachments?: string[];
+     order_id?:string, 
+     file_data?: string[]; // Add file_data to handle file attachments
+     file_type?: string[]; // Add file_type to handle different file types
 }
 
 interface SendMessageParams {

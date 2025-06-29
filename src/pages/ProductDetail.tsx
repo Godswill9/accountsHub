@@ -21,6 +21,20 @@ export interface PaymentDetails {
   ref: string;
 }
 
+export interface ConversationDetails {
+    order_id:string, 
+    buyer_id:string, 
+    seller_id:string, 
+    product_id:string, 
+}
+
+export interface ChatDetails {
+     order_id:string, 
+     sender_id:string, 
+     sender_role:string,
+     message:string
+}
+
 // Interface for AccountDetails
 export interface AccountDetails {
   item_id: string;
@@ -233,6 +247,7 @@ const ProductDetail = () => {
       const data = await response.json();
       if (response.ok) {
         console.log("order created successfuflly:", data);
+        await createConversation({order_id: data.order_id, buyer_id: orderData.buyer_id, seller_id: orderData.seller_id, product_id: orderData.item_id});
       } else {
         console.error("❌ Error saving payment:", data.message);
       }
@@ -277,7 +292,7 @@ const ProductDetail = () => {
         const data2 = await response2.json();
         if (data2.message === "Funds transferred successfully") {
           alert("Payment received. Check downloads for txt file");
-          await downloadfetchAcc(inputValue);
+          // await downloadfetchAcc(inputValue);
           await updateCouponCode(data.id, userId);
           await savePayment({
             payment_type: "order",
@@ -299,7 +314,8 @@ const ProductDetail = () => {
             ref: "ref",
           });
         } else {
-          console.log(data2.messsage);
+          alert(data2.error);
+          console.log(data2);
         }
       } catch (error) {
         console.log(error.message);
@@ -323,7 +339,7 @@ const ProductDetail = () => {
         const data = await response.json();
         if (data.message === "Funds transferred successfully") {
           alert("Payment received. Check downloads for txt file");
-          await downloadfetchAcc(inputValue);
+          // await downloadfetchAcc(inputValue);
           savePayment({
             payment_type: "order",
             payment_status: "completed",
@@ -344,7 +360,8 @@ const ProductDetail = () => {
             ref: "ref",
           });
         } else {
-          console.log(data.messsage);
+          alert(data.error)
+          console.log(data);
         }
       } catch (error) {
         console.log(error.message);
@@ -352,6 +369,7 @@ const ProductDetail = () => {
     }
   }
 
+  
   async function savePayment(paymentData: PaymentDetails) {
     try {
       const response = await fetch(
@@ -364,7 +382,7 @@ const ProductDetail = () => {
       );
 
       const data = await response.json();
-      if (data.meaaage === "Payment saved successfully") {
+      if (data.message === "Payment saved successfully") {
         console.log("✅ Payment saved successfully:", data);
       } else {
         console.error("❌ Error saving payment:", data.message);
@@ -373,7 +391,52 @@ const ProductDetail = () => {
       console.error("❌ Network error:", error.message);
     }
   }
+  async function createConversation(conversationData: ConversationDetails) {
+    try {
+      const response = await fetch(
+        "https://aitool.asoroautomotive.com/api/conversations",
+        // "http://localhost:8086/api/conversations",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(conversationData),
+        }
+      );
 
+      const data = await response.json();
+      if (data.message === "Conversation created successfully") {
+        console.log("✅ Conversation created successfully:", data); 
+       await sendMessage({order_id: data.order_id, sender_id: userId, sender_role: "buyer", message: "Hello, I would like to purchase this product."});
+      } else {
+        console.error("❌ Error creating conversation:", data.message);
+      }
+    } catch (error) {
+      console.error("❌ Network error:", error.message);
+    }
+  }
+ 
+  async function sendMessage(chatData: ChatDetails) {
+    try {
+      const response = await fetch(
+        "https://aitool.asoroautomotive.com/api/sendMessage",
+        // "http://localhost:8086/api/sendMessage",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(chatData),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        console.log("✅ Message sent successfully:", data);
+      } else {
+        console.error("❌ Error sending message:", data.message);
+      }
+    } catch (error) {
+      console.error("❌ Network error:", error.message);
+    }
+  }
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />

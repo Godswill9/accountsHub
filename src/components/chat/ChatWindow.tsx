@@ -21,26 +21,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   onSendFiles,
   userId
 }) => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [messages]);
-
-//   useEffect(() => {
-//   const chatContainer = messagesEndRef.current?.parentElement;
-//   if (!chatContainer) return;
-
-//   const isUserNearBottom =
-//     chatContainer.scrollHeight - chatContainer.scrollTop <=
-//     chatContainer.clientHeight + 150;
-
-//   if (isUserNearBottom || messages[messages.length - 1]?.sender === userId) {
-//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-//   }
-// }, [messages]);
-
-
+  // const messagesEndRef = useRef<HTMLDivElement>(null);
   return (
    <div className="flex flex-col w-full max-w-3xl h-[80vh] bg-white rounded-xl shadow-lg border mx-auto">
   <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -57,23 +38,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       </>
     ) : messages.length > 0 ? (
-      messages.map((msg) => (
+      messages.map((msg) => {
+        console.log(msg.sender_role)
+        return(
         <ChatMessage
-          key={msg.id}
-          id={msg.id}
+          key={msg.id || msg.message_id}
+          id={msg.id || msg.message_id}
           content={msg.message || msg.content || ""}
-          sender={msg.sender_id || msg.sender || ""}
-          timestamp={msg.time_received || msg.timestamp}
+          sender={msg.sender_id || msg.sender || msg.sender_role}
+          timestamp={msg.time_received || msg.timestamp || msg.sent_at}
           seen={msg.seen_by_user === 1 || msg.seen === true}
           attachments={msg.attachments}
+          userId={userId}
         />
-      ))
+      )})
     ) : (
       <div className="flex items-center justify-center h-full text-gray-500">
         No messages yet. Start the conversation!
       </div>
     )}
-    <div ref={messagesEndRef} />
+    {/* <div ref={messagesEndRef} /> */}
   </div>
 
   <div className="p-4 border-t bg-gray-100 rounded-b-xl">

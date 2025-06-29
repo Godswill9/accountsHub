@@ -12,6 +12,7 @@ interface ChatMessageProps {
   seen?: number | boolean;
   seen_by_user?: number;
   attachments?: string[];
+  userId?: string; // Optional userId prop for future use
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -22,8 +23,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   seen,
   seen_by_user,
   attachments = [],
+  userId
 }) => {
-  const isUser = sender === "user";
+ const isUser = sender === userId;
   const messageTime = timestamp || time_received;
   const isMessageSeen =
     seen !== undefined
@@ -81,20 +83,25 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     return <FileText className="h-4 w-4" />;
   };
 
+  // const isImageUrl = (url: string) => {
+  //   console.log(url)
+  //   const ext = url.split(".").pop()?.toLowerCase();
+  //   return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext || "");
+  // };
+
   const isImageUrl = (url: string) => {
-    const ext = url.split(".").pop()?.toLowerCase();
-    return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext || "");
-  };
+  return url.startsWith("data:image/");
+};
 
   return (
-    <div
-      className={cn(
-        "flex flex-col w-fit max-w-[70%] sm:max-w-[50%] rounded-lg p-3 mb-3 relative transition-all",
-        !isUser
-          ? "ml-auto bg-blue-950 text-white rounded-br-none hover:bg-blue-980"
-          : "mr-auto bg-gray-100 text-gray-800 rounded-bl-none hover:bg-gray-200"
-      )}
-    >
+   <div
+  className={cn(
+    "flex flex-col w-fit max-w-[70%] sm:max-w-[50%] rounded-lg p-3 mb-3 relative transition-all",
+    isUser
+      ? "ml-auto bg-blue-950 text-white rounded-br-none hover:bg-blue-980"
+      : "mr-auto bg-gray-100 text-gray-800 rounded-bl-none hover:bg-gray-200"
+  )}
+>
       {!isMessageSeen && !isUser && (
         <div
           className="absolute -left-2 top-1 h-2 w-2 rounded-full bg-red-500 animate-pulse"
@@ -128,7 +135,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
       {attachments && attachments.length > 0 && (
         <div className="mt-2 space-y-2">
-          {attachments.map((url, idx) => (
+          {attachments.map((url, idx) => {
+              // console.log("attachment item:", url);
+            return(
             <div key={idx} className="flex flex-col">
               {isImageUrl(url) ? (
                 <div className="group relative">
@@ -136,13 +145,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                     src={url}
                     alt={`Attachment ${idx + 1}`}
                     className="max-w-full rounded-md max-h-[200px] object-contain hover:opacity-95 cursor-pointer transition-all"
-                    onClick={() => window.open(url, "_blank")}
+                    // onClick={() => window.open(url, "_blank")}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-md flex items-center justify-center">
+                  {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-md flex items-center justify-center">
                     <span className="opacity-0 group-hover:opacity-100 text-white text-sm">
                       Click to view
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               ) : (
                 <a
@@ -161,7 +170,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 </a>
               )}
             </div>
-          ))}
+          )})}
         </div>
       )}
 
