@@ -64,6 +64,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     }
   };
 
+
   // / Fetch images for messages starting with "get-image"
   //   useEffect(() => {
   //     if (messages) {
