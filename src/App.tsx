@@ -28,6 +28,7 @@ import SuccessPage from "./pages/successPage";
 import ErrorPage from "./pages/error";
 import NotificationsPage from "./pages/Notifications";
 import OrderChatPage from "./pages/OrderChat";
+import VerifyPaymentPage from "./pages/loading";
 
 // Create a Client once for the entire application
 const queryClient = new QueryClient({
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="/order/:orderId" element={<OrderDetailPage />} />
               <Route path="/success" element={<SuccessPage />} />
               <Route path="/error" element={<ErrorPage />} />
+              <Route path="/verify-payment" element={<VerifyPaymentPage />} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

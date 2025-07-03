@@ -10,6 +10,7 @@ const SuccessPage = () => {
   const location = useLocation();
   //   const { checkAuthStatus } = useAuth();
   const [userId, setUserId] = useState("");
+  const [ref, setRef] = useState("");
   const transactionId = new URLSearchParams(location.search).get(
     "transactionId"
   ); // Extract transactionId from URL
@@ -47,11 +48,17 @@ const SuccessPage = () => {
     };
 
     fetchAuthStatus();
+
+    const query = new URLSearchParams(window.location.search);
+const txRef = query.get("tx_ref");
+setRef(txRef || ""); // Set ref from URL query parameter
+const transactionId = query.get("transaction_id");
+
   }, []);
 
   const verifyPayment = async (id: String) => {
     if (
-      localStorage.getItem("currentPayment") === "add_to_wallet_with_stripe"
+      localStorage.getItem("currentPayment") === "add_to_wallet_with_normal_currency"
     ) {
       const updatevalue = async (userId, amount) => {
         try {
@@ -73,7 +80,10 @@ const SuccessPage = () => {
           const data = await response.json();
           console.log(data);
           if (data.message === "Funds added successfully") {
-            savePayment(JSON.parse(localStorage.getItem("paymentDetails")));
+             const query = new URLSearchParams(window.location.search);
+const txRef = query.get("tx_ref");
+            // savePayment(JSON.parse(localStorage.getItem("paymentDetails")));
+             savePayment({...JSON.parse(localStorage.getItem("paymentDetails")), payment_status: "completed", ref: txRef});
             localStorage.setItem("paymentDetails", "");
             localStorage.setItem("currentPayment", "");
           }
@@ -110,6 +120,7 @@ const SuccessPage = () => {
           console.log(data);
           if (data.message === "Funds added successfully") {
             savePayment(JSON.parse(localStorage.getItem("paymentDetails")));
+
             localStorage.setItem("paymentDetails", "");
             localStorage.setItem("currentPayment", "");
           }
