@@ -87,6 +87,10 @@ const WalletPage: React.FC = () => {
   const [paymentType, setPaymentType] = useState("normal");
   const [cryptoPrice, setcryptoPrice] = useState("");
 
+
+
+
+
   const [usdEquivalent, setUsdEquivalent] = useState(null);
   const [error, setError] = useState("");
 
@@ -586,7 +590,7 @@ const getRate = async (from, to) => {
 
               <TabsContent value="withdraw" className="mt-0">
                 <div className="max-w-xl mx-auto">
-                  <WithdrawFundsForm currentBalance={balance} />
+                  <WithdrawFundsForm currentBalance={balance} userId={userId} />
                 </div>
               </TabsContent>
             </Tabs>

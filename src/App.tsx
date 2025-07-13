@@ -29,6 +29,7 @@ import ErrorPage from "./pages/error";
 import NotificationsPage from "./pages/Notifications";
 import OrderChatPage from "./pages/OrderChat";
 import VerifyPaymentPage from "./pages/loading";
+import SellerDetailsPage from "./pages/SellerDetailsPage";
 
 // Create a Client once for the entire application
 const queryClient = new QueryClient({
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/" element={<HomePage />} />
               <Route path="/digital-products" element={<DigitalProducts />} />
               <Route path="/digital-products/:id" element={<ProductDetail />} />
+              <Route path="/about-seller/:sellerId" element={<SellerDetailsPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />

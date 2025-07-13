@@ -105,52 +105,6 @@ const OrderChatPage: React.FC = () => {
   }
 }
 
-  // Load messages when both orderId and userId are ready
-//   useEffect(() => {
-//     if (!orderId || !userId) return; // Do not proceed if orderId or userId is not available
-
-//     const loadMessages = async () => {
-//       try {
-//         setIsLoading(true);
-
-//         // Fetch ticket subject
-//         const ticket = await ticketService.getTicket(orderId);
-//         if (ticket) {
-//           setorderSubject(ticket.subject);
-//         }
- 
-//         // Fetch initial messages
-//         const fetchedMessages = await messageService.fetchMessages({
-//           ticket_id: orderId,
-//         });
-
-//         if (fetchedMessages.length === 0) {
-//           toast.info("No messages found for this ticket.");
-//         }
-//         setMessages(fetchedMessages);
-
-//         // Mark unread admin messages as seen
-//         fetchedMessages.forEach((msg) => {
-//           if (
-//             (msg.seen_by_user === 0 || msg.seen === false) &&
-//             (msg.sender_id === "admin" || msg.sender === "admin")
-//           ) {
-//             messageService.markAsSeen(msg.id);
-//           }
-//         });
-//       } catch (error) {
-//         console.error("Error loading messages:", error);
-//         toast.error("Failed to load messages");
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-
-//     loadMessages();
-//   }, [orderId, userId]); // This will run only when both `orderId` and `userId` are available
-
-  // Poll for new messages every 30 seconds only when both orderId and userId are ready
-
 const fetchChatMessages = async (orderId) => {
   try {
     const response = await fetch(`https://aitool.asoroautomotive.com/api/${orderId}`, {
@@ -186,6 +140,24 @@ const fetchChatMessages = async (orderId) => {
     }
   };
 
+  const setMessagesSeen = async (messageIds: string[]) => {
+  try {
+    await Promise.all(
+      messageIds.map(async (id) => {
+        await axios.patch(
+          `https://aitool.asoroautomotive.com/api/seen/${id}`,
+          {},
+          { withCredentials: true }
+        );
+      })
+    );
+
+    console.log("All unseen messages marked as seen.");
+  } catch (error) {
+    console.error("Error marking messages as seen:", error);
+  }
+};
+
   useEffect(() => {
   const loadMessages = async () => {
     const data = await fetchChatMessages(orderId);
@@ -195,6 +167,7 @@ const fetchChatMessages = async (orderId) => {
         setChatStatus(conversation.status);
       }
     });
+    
 
     if (Array.isArray(data)) {
       const processed = data.map((msg) => {
@@ -205,7 +178,15 @@ const fetchChatMessages = async (orderId) => {
       });
 
       setMessages(processed);
-      console.log("Processed messages:", processed);
+
+        // Filter unseen messages from the buyer
+    const unseenMessageIds = processed
+      .filter(msg => msg.seen_by_receiver === 0 && msg.sender_role === 'seller')
+      .map(msg => msg.message_id);
+    if (unseenMessageIds.length > 0) {
+      setMessagesSeen(unseenMessageIds);
+    }
+      // console.log("Processed messages:", processed);
     }
 
     setIsLoading(false);

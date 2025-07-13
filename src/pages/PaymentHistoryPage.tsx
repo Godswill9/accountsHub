@@ -19,6 +19,8 @@ interface Payment {
   ref: string;
   created_at: string;
   currency: string;
+  seen_by_user: boolean;
+  payment_id: string;
 }
 
 const PaymentHistoryPage: React.FC = () => {

@@ -291,7 +291,10 @@ const ProductDetail = () => {
         );
         const data2 = await response2.json();
         if (data2.message === "Funds transferred successfully") {
-          alert("Payment received. Check downloads for txt file");
+          alert("Payment received. View details in orders page");
+          setTimeout(()=>{
+            window.location.reload
+          }, 1000)
           // await downloadfetchAcc(inputValue);
           await updateCouponCode(data.id, userId);
           await savePayment({
@@ -338,7 +341,10 @@ const ProductDetail = () => {
 
         const data = await response.json();
         if (data.message === "Funds transferred successfully") {
-          alert("Payment received. Check downloads for txt file");
+          alert("Payment received. View details in orders page");
+          setTimeout(()=>{
+            window.location.reload
+          }, 1000)
           // await downloadfetchAcc(inputValue);
           savePayment({
             payment_type: "order",
@@ -494,6 +500,21 @@ const ProductDetail = () => {
                   />
                 ))}
               </div>
+{product && (
+  sellerId ? (
+    <Link
+      to={`/about-seller/${sellerId}`}
+      className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition mb-4"
+    >
+      View Seller
+    </Link>
+  ) : (
+    <p className="text-sm text-gray-600 mb-4 italic">
+      This product was added by the <span className="font-semibold text-gray-800">Admin</span>.
+    </p>
+  )
+)}
+
             </div>
 
             {/* Right column: details + description */}

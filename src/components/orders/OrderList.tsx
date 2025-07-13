@@ -33,10 +33,10 @@ interface Order {
 
 interface OrderListProps {
   orders: Order[];
+  messagesCount?: Record<string, number>; // Optional prop for messages count
 }
 
-const OrderList: React.FC<OrderListProps> = ({ orders }) => {
-  console.log(orders);
+const OrderList: React.FC<OrderListProps> = ({ orders, messagesCount }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -102,18 +102,26 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
         </TableCell>
         <TableCell>${Number(order.amount).toFixed(2)}</TableCell>
         <TableCell>{Number(order.quantity)} accounts</TableCell>
-        <TableCell className="text-right">
-          <Link to={`/order/${order.order_id}`}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => updateOrderSeen(order.order_id)}
-            >
-              <Eye className="h-4 w-4 mr-1" />
-              View
-            </Button>
-          </Link>
-        </TableCell>
+        <TableCell className="text-right flex items-center justify-end gap-2">
+  <Link to={`/order/${order.order_id}`}>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => updateOrderSeen(order.order_id)}
+      className="flex items-center gap-1"
+    >
+      <Eye className="h-4 w-4" />
+      View
+    </Button>
+  </Link>
+
+  {messagesCount[order.order_id] > 0 && (
+    <span className="text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+      {messagesCount[order.order_id]}
+    </span>
+  )}
+</TableCell>
+
       </TableRow>
     ))
   ) : (
