@@ -57,6 +57,7 @@ const ProductDetail = () => {
   const [couponValue, setcouponValue] = useState(""); // State to store the input value
   const [totalPriceValue, settotalPriceValue] = useState(0); // State to store the input value
   const [carouselImages, setCarouselImages] = useState([]);
+    const [isBanned, setIsBanned] = useState(false);
 
   const handleDownloadClick = () => {
     setShowInput(true); // Show the input and button when "Download Sample" is clicked
@@ -146,6 +147,9 @@ const ProductDetail = () => {
           // console.log(response);
           setUserId(response.id);
           setUserEmail(response.email);
+           if (response?.acc_status && response.acc_status !== "Okay") {
+            setIsBanned(true);
+          }
         }
       } catch (error) {
         console.error("Auth status check failed:", error);
@@ -550,7 +554,12 @@ const ProductDetail = () => {
               </div>
 
               {/* Purchase section */}
-              <div className="space-y-8">
+                   <div className="space-y-8">
+                     {isBanned? (
+              <div className="bg-red-100 text-red-800 border border-red-300 p-4 rounded-md text-center font-medium">
+      🚫 You cannot make a purchase because your account has been <span className="font-semibold">banned</span>. Please contact support for more information.
+    </div>
+            ):(
                 <div className="w-full bg-white p-6 rounded-md shadow-lg flex flex-col gap-4">
                   <button
                     onClick={() => setShowInput(!showInput)}
@@ -572,7 +581,7 @@ const ProductDetail = () => {
                       : "Purchase"}
                   </button>
                 </div>
-
+  )}
                 {showInput && (
                   <div className="bg-gray-50 p-6 rounded-md shadow-md space-y-6">
                     <h2 className="text-2xl font-semibold text-gray-900">
@@ -595,6 +604,7 @@ const ProductDetail = () => {
                         >
                           -
                         </button>
+                    
                         <span className="text-3xl font-semibold text-gray-800">
                           {inputValue}
                         </span>
@@ -620,7 +630,6 @@ const ProductDetail = () => {
                         Total: ${totalPriceValue.toFixed(2)}
                       </div>
                     </div>
-
                     <button
                       disabled={!product || product.stock_quantity <= 0}
                       onClick={createPayment}
@@ -632,9 +641,13 @@ const ProductDetail = () => {
                     >
                       Confirm Purchase
                     </button>
+                    
                   </div>
                 )}
               </div>
+            
+
+
             </div>
           </div>
         )}

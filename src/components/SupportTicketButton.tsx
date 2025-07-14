@@ -4,8 +4,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MessageCircleQuestion } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+interface SupportTicketButtonProps {
+  unread?: number;
+}
 
-const SupportTicketButton: React.FC = () => {
+const SupportTicketButton: React.FC<SupportTicketButtonProps> = ({ unread }) => {
   const isMobile = useIsMobile();
 
   return (
@@ -22,6 +25,17 @@ const SupportTicketButton: React.FC = () => {
       >
         <MessageCircleQuestion className={isMobile ? "h-5 w-5" : "h-4 w-4 mr-1"} />
         {!isMobile && "Support"}
+
+      {typeof unread === "number" && unread > 0 && (
+  <span
+    className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[11px] font-bold min-w-[18px] h-[18px] px-[6px] rounded-full flex items-center justify-center border-2 border-white shadow-sm"
+    title={`${unread} unread ticket${unread > 1 ? 's' : ''}`}
+  >
+    {unread > 99 ? "99+" : unread}
+  </span>
+)}
+
+
       </Button>
     </Link>
   );

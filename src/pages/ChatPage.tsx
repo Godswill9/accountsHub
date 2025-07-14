@@ -86,32 +86,32 @@ const ChatPage: React.FC = () => {
   }, [ticketId, userId]); // This will run only when both `ticketId` and `userId` are available
 
   // Poll for new messages every 30 seconds only when both ticketId and userId are ready
-  useEffect(() => {
-    if (!ticketId || !userId) return; // Prevent polling if ticketId or userId are not available
+ useEffect(() => {
+  if (!ticketId || !userId) return;
 
-    const interval = setInterval(async () => {
-      try {
-        const fetchedMessages = await messageService.fetchMessages({
-          ticket_id: ticketId,
-        });
-        setMessages(fetchedMessages);
+  const fetchAndMarkMessages = async () => {
+    try {
+      const fetchedMessages = await messageService.fetchMessages({
+        ticket_id: ticketId,
+      });
+      setMessages(fetchedMessages);
 
-        // Mark unread admin messages as seen
-        fetchedMessages.forEach((msg) => {
-          if (
-            (msg.seen_by_user === 0 || msg.seen === false) &&
-            (msg.sender_id === "admin" || msg.sender === "admin")
-          ) {
-            messageService.markAsSeen(msg.id);
-          }
-        });
-      } catch (error) {
-        console.error("Error polling messages:", error);
-      }
-    }, 30000);
+      // Mark unread admin messages as seen
+      fetchedMessages.forEach((msg) => {
+        if (
+          (msg.seen_by_user === 0 || msg.seen === false) &&
+          (msg.sender_id === "admin" || msg.sender === "admin")
+        ) {
+          messageService.markAsSeen(msg.id);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
 
-    return () => clearInterval(interval); // Clean up interval on unmount
-  }, [ticketId, userId]); // This will run only when both `ticketId` and `userId` are available
+  fetchAndMarkMessages();
+}, []);
 
   const handleSendMessage = async (content: string, type: string = "text") => {
     if (!ticketId || !content.trim() || !userId) return;

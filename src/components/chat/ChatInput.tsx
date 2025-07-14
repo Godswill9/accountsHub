@@ -22,25 +22,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { ticketId } = useParams<{ ticketId: string }>();
   const [userId, setUserId] = useState<string | null>(null);
-  // const { checkAuthStatus } = useAuth();
-
-  // useEffect(() => {
-  //   const fetchAuthStatus = async () => {
-  //     try {
-  //       const response = await checkAuthStatus();
-  //       if (response.message === "Please log in again.") {
-  //         setUserId("");
-  //       } else {
-  //         setUserId(response.id);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error in fetching auth status:", error);
-  //     }
-  //   };
-
-  //   fetchAuthStatus();
-  // }, [checkAuthStatus]);
-
+ 
   const handleSendMessage = async () => {
     if (!message.trim() && selectedFiles.length === 0) return;
 

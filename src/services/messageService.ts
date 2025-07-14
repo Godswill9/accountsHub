@@ -45,8 +45,8 @@ const apiRequest = async (url: string, method: string, data?: any) => {
   try {
     // For debugging in development only
     if (import.meta.env.DEV) {
-      console.log(`Making ${method} request to: ${url}`);
-      if (data) console.log('Request data:', data);
+      // console.log(`Making ${method} request to: ${url}`);
+      // if (data) console.log('Request data:', data);
     }
 
     const options: RequestInit = {
@@ -69,7 +69,7 @@ const apiRequest = async (url: string, method: string, data?: any) => {
     
     // Log response in development
     if (import.meta.env.DEV) {
-      console.log('Response:', responseData);
+      // console.log('Response:', responseData);
     }
 
     if (!response.ok) {
@@ -102,7 +102,7 @@ export const uploadFiles = async (
     // formData.append("fileMessage", message);
 
     const response = await apiRequest(FILE_ENDPOINTS.UPLOAD, "POST", formData);
-    console.log(response)
+    // console.log(response)
     return response.fileUrls;
   } catch (error) {
     console.error("File upload error:", error);
@@ -113,34 +113,82 @@ export const uploadFiles = async (
 
 // Message service functions
 export const messageService = {
-  sendMessage: async ({message, ticket_id, message_type, sender_id, admin_id, attachments }: SendMessageParams): Promise<Message> => {
+//   sendMessage: async ({message, ticket_id, message_type, sender_id, admin_id, attachments }: SendMessageParams): Promise<Message> => {
+//   try {
+//   let fileUrls: string[] = [];
+
+//   // Upload files first if there are any
+//   if (attachments && attachments.length > 0) {
+//     fileUrls = await uploadFiles(attachments, sender_id, admin_id, ticket_id);
+//   }
+
+//   // Send the message (with or without attachments)
+//   const response = await apiRequest(MESSAGE_ENDPOINTS.SEND_USER, 'POST', {
+//     message, 
+//     ticket_id, 
+//     message_type, 
+//     sender_id,
+//     admin_id,
+//     attachments: fileUrls,
+//   });
+
+//   return response.message;
+
+// } catch (error) {
+//   toast.error("Failed to send message");
+//   throw error;
+// }
+
+//   },
+  sendMessage: async ({
+  message,
+  ticket_id,
+  message_type,
+  sender_id,
+  admin_id,
+  attachments,
+}: SendMessageParams): Promise<Message> => {
   try {
-  let fileUrls: string[] = [];
+    const hasText = message && message.trim() !== "";
+    const hasFiles = attachments && attachments.length > 0;
 
-  // Upload files first if there are any
-  if (attachments && attachments.length > 0) {
-    fileUrls = await uploadFiles(attachments, sender_id, admin_id, ticket_id);
+    // Abort if nothing to send
+    if (!hasText && !hasFiles) {
+      throw new Error("Cannot send an empty message without attachments.");
+    }
+
+    let fileUrls: string[] = [];
+
+    // Upload files if any
+    if (hasFiles) {
+      fileUrls = await uploadFiles(attachments, sender_id, admin_id, ticket_id);
+    }
+
+    // Build request payload without empty message field
+    const payload: any = {
+      ticket_id,
+      message_type,
+      sender_id,
+      admin_id,
+    };
+
+    if (hasText) {
+      payload.message = message.trim();
+    }
+
+    if (fileUrls.length > 0) {
+      payload.attachments = fileUrls;
+    }
+
+    const response = await apiRequest(MESSAGE_ENDPOINTS.SEND_USER, "POST", payload);
+
+    return response.message;
+  } catch (error) {
+    toast.error(error.message || "Failed to send message");
+    throw error;
   }
+},
 
-  // Send the message (with or without attachments)
-  const response = await apiRequest(MESSAGE_ENDPOINTS.SEND_USER, 'POST', {
-    message, 
-    ticket_id, 
-    message_type, 
-    sender_id,
-    admin_id,
-    attachments: fileUrls,
-  });
-
-  return response.message;
-
-} catch (error) {
-  toast.error("Failed to send message");
-  throw error;
-}
-
-  },
-  
   fetchMessages: async ({ ticket_id }: FetchMessagesParams): Promise<Message[]> => {
     try {
       const response = await apiRequest(MESSAGE_ENDPOINTS.FETCH_PER_TICKET, 'POST', { ticket_id });
@@ -167,7 +215,6 @@ export const messageService = {
       await apiRequest(MESSAGE_ENDPOINTS.MARK_SEEN_BY_USER, 'PUT', { messageId });
     } catch (error) {
       console.error('Failed to mark message as seen:', error);
-      // Don't show toast for this as it's a background operation
     }
   }
 };

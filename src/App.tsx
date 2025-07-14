@@ -30,6 +30,9 @@ import NotificationsPage from "./pages/Notifications";
 import OrderChatPage from "./pages/OrderChat";
 import VerifyPaymentPage from "./pages/loading";
 import SellerDetailsPage from "./pages/SellerDetailsPage";
+import BannedPage from "./pages/BannedPage";
+import ProtectedRoute from "@/pages/ProtectedRoute"; // adjust path
+
 
 // Create a Client once for the entire application
 const queryClient = new QueryClient({
@@ -41,6 +44,7 @@ const queryClient = new QueryClient({
   },
 });
 
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -50,6 +54,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
               <Route path="/digital-products" element={<DigitalProducts />} />
               <Route path="/digital-products/:id" element={<ProductDetail />} />
@@ -57,37 +62,147 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/user-home" element={<UserHomePage />} />
+              <Route path="/banned" element={<BannedPage />} />
 
-              {/* Ticket Routes */}
-              <Route path="/ticket" element={<TicketPage />} />
-              <Route path="/tickets" element={<TicketsListPage />} />
-              <Route path="/chat/:ticketId" element={<ChatPage />} />
-              <Route path="/conversation/:orderId" element={<OrderChatPage/>} />
-
-              {/* Wallet Routes */}
-              <Route path="/wallet" element={<WalletPage />} />
+              {/* Protected Routes */}
+              {/* <Route
+                path="/user-home"
+                element={
+                  <ProtectedRoute>
+                    <UserHomePage />
+                  </ProtectedRoute>
+                }
+              /> */}
               <Route
+                path="/ticket"
+                element={
+                  <ProtectedRoute>
+                    <TicketPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tickets"
+                element={
+                  <ProtectedRoute>
+                    <TicketsListPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/chat/:ticketId"
+                element={
+                  <ProtectedRoute>
+                    <ChatPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/conversation/:orderId"
+                element={
+                  <ProtectedRoute>
+                    <OrderChatPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/wallet"
+                element={
+                  <ProtectedRoute>
+                    <WalletPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* <Route
                 path="/add-funds/card"
-                element={<CreateCurrencyPayment />}
+                element={
+                  <ProtectedRoute>
+                    <CreateCurrencyPayment />
+                  </ProtectedRoute>
+                }
+              /> */}
+              {/* <Route
+                path="/add-funds/crypto"
+                element={
+                  <ProtectedRoute>
+                    <CreateCryptoPayment />
+                  </ProtectedRoute>
+                }
+              /> */}
+              <Route
+                path="/payment-history"
+                element={
+                  <ProtectedRoute>
+                    <PaymentHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* <Route
+                path="/payment-success"
+                element={
+                  <ProtectedRoute>
+                    <PaymentSuccessPage />
+                  </ProtectedRoute>
+                }
+              /> */}
+              <Route
+                path="/orders"
+                element={
+                  <ProtectedRoute>
+                    <OrdersPage />
+                  </ProtectedRoute>
+                }
               />
               <Route
-                path="/add-funds/crypto"
-                element={<CreateCryptoPayment />}
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <NotificationsPage />
+                  </ProtectedRoute>
+                }
               />
-              <Route path="/payment-history" element={<PaymentHistoryPage />} />
-              <Route path="/payment-success" element={<PaymentSuccessPage />} />
+              <Route
+                path="/create-order"
+                element={
+                  <ProtectedRoute>
+                    <CreateOrderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/order/:orderId"
+                element={
+                  <ProtectedRoute>
+                    <OrderDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/success"
+                element={
+                  <ProtectedRoute>
+                    <SuccessPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/error"
+                element={
+                  <ProtectedRoute>
+                    <ErrorPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/verify-payment"
+                element={
+                  <ProtectedRoute>
+                    <VerifyPaymentPage />
+                  </ProtectedRoute>
+                }
+              />
 
-              {/* Order Routes */}
-              <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/create-order" element={<CreateOrderPage />} />
-              <Route path="/order/:orderId" element={<OrderDetailPage />} />
-              <Route path="/success" element={<SuccessPage />} />
-              <Route path="/error" element={<ErrorPage />} />
-              <Route path="/verify-payment" element={<VerifyPaymentPage />} />
-
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              {/* Catch-All */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

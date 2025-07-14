@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ticketService } from "@/services/ticketService";
+import { messageService } from "@/services//messageService";
 import { authService } from "@/services/authService";
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from "@/components/Header";
@@ -33,6 +34,7 @@ interface Ticket {
   created_at: string;
   updatedAt: string;
   unreadCount: number;
+  priority:string;
 }
 
 const TicketsListPage: React.FC = () => {
@@ -40,6 +42,11 @@ const TicketsListPage: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+const totalUnread = Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
+const totalUnreadConversations = Object.keys(unreadCounts).length;
+
+
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -54,10 +61,6 @@ const TicketsListPage: React.FC = () => {
           console.log(response);
           setUserId(response.id);
           const userTickets = await ticketService.getUserTickets(response.id);
-          // if (userTickets.message === "Tickets not found.") {
-          //   toast.error("No tickets found.");
-          //   setTickets([]);
-          // }
 
           if (Array.isArray(userTickets)) {
   setTickets(userTickets);
@@ -65,8 +68,6 @@ const TicketsListPage: React.FC = () => {
   toast.error("No tickets found.");
   setTickets([]);
 }
-          // console.log(userTickets);
-          // setTickets(userTickets);
         }
       } catch (error) {
         console.error("Authentication error", error);
@@ -77,6 +78,37 @@ const TicketsListPage: React.FC = () => {
 
     checkAuthStatus();
   }, []);
+
+useEffect(() => {
+  const fetchUnreadCounts = async () => {
+    const counts: Record<string, number> = {};
+
+    for (const ticket of tickets) {
+      try {
+        const messages = await messageService.fetchMessages({ ticket_id: ticket.ticket_id });
+
+        // console.log(messages)
+
+        const unseen = messages.filter((msg) => msg.seen_by_user === 0).length;
+
+        if (unseen > 0) {
+          counts[ticket.ticket_id] = unseen;
+        }
+      } catch (err) {
+        console.error("Error fetching messages for ticket", ticket.ticket_id, err);
+      }
+    }
+    setUnreadCounts(counts);
+  };
+
+  if (tickets.length > 0) {
+    fetchUnreadCounts();
+  }
+}, [tickets]);
+
+
+
+
 
   useEffect(() => {
     // Scroll to the top of the page when the component is mounted
@@ -155,66 +187,75 @@ const TicketsListPage: React.FC = () => {
           </div>
         ) : tickets.length > 0 ? (
           <div className="space-y-4">
-            {tickets.map((ticket) => (
-              <Card
-                key={ticket.ticket_id}
-                className="relative hover:shadow-lg h-auto hover:scale-[1.01] transition-all duration-200 rounded-2xl border p-4"
-              >
-                {ticket.unreadCount > 0 && (
-                  <span className="absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-md">
-                    {ticket.unreadCount}
-                  </span>
-                )}
+           {tickets.map((ticket) => {
+  const unreadCount = unreadCounts[ticket.ticket_id] || 0;
 
-                <CardHeader className="p-1">
-                  <CardTitle className="text-lg font-semibold leading-snug text-gray-900">
-                    {ticket.subject.toLocaleUpperCase()}
-                  </CardTitle>
-                  <CardDescription className="mt-1 flex items-center text-sm text-gray-500">
-                    <Clock className="h-4 w-4 mr-1" />
-                    Created on {formatDate(ticket.created_at)}
-                  </CardDescription>
-                </CardHeader>
+  return (
+    <Card
+      key={ticket.ticket_id}
+      className="relative hover:shadow-lg h-auto hover:scale-[1.01] transition-all duration-200 rounded-2xl border p-4"
+    >
+      {unreadCount > 0 && (
+        <div className="absolute top-3 right-3">
+          <span
+            className="bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-full px-2 sm:px-3 py-[2px] shadow-md whitespace-nowrap"
+            title={`${unreadCount} unread message${unreadCount > 1 ? "s" : ""}`}
+          >
+            <span className="sm:hidden">{unreadCount}</span>
+            <span className="hidden sm:inline">
+              {unreadCount} Unread
+            </span>
+          </span>
+        </div>
+      )}
 
-                <CardContent className="p-1">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="outline"
-                      className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(
-                        ticket.category
-                      )}`}
-                    >
-                      {ticket.category}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        ticket.status === "open"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {ticket.status === "open" ? "Open" : "Closed"}
-                    </Badge>
-                  </div>
-                </CardContent>
+      <CardHeader className="p-1">
+        <CardTitle className="text-lg font-semibold leading-snug text-gray-900">
+          {ticket.subject.toLocaleUpperCase()}
+        </CardTitle>
+        <CardDescription className="mt-1 flex items-center text-sm text-gray-500">
+          <Clock className="h-4 w-4 mr-1" />
+          Created on {formatDate(ticket.created_at)}
+        </CardDescription>
+      </CardHeader>
 
-                <CardFooter className="p-1">
-                  {ticket.status === "open" ? (
-                    <Button
-                      variant="ghost"
-                      className="flex items-center text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-0 gap-1"
-                      onClick={() => handleViewTicket(ticket.ticket_id)}
-                    >
-                      View Conversation
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    ""
-                  )}
-                </CardFooter>
-              </Card>
-            ))}
+      <CardContent className="p-1">
+        <div className="flex flex-wrap gap-2">
+          <Badge
+            variant="outline"
+            className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(ticket.category)}`}
+          >
+            {ticket.priority}
+          </Badge>
+          <Badge
+            variant="outline"
+            className={`text-xs px-2 py-1 rounded-full ${
+              ticket.status === "open"
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {ticket.status !== "closed" ? "Open" : "Closed"}
+          </Badge>
+        </div>
+      </CardContent>
+
+      <CardFooter className="p-1">
+        {ticket.status !== "closed" && (
+          <Button
+            variant="ghost"
+            className="flex items-center text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-0 gap-1"
+            onClick={() => handleViewTicket(ticket.ticket_id)}
+          >
+            View Conversation
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
+  );
+})}
+
           </div>
         ) : (
           <Card className="text-center py-8">

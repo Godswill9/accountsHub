@@ -107,7 +107,7 @@ return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
       <main className="container max-w-5xl mx-auto px-4 py-10 flex-grow">
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 md:p-10 space-y-8">
+        <div className="bg-white rounded-xl shadow-md border border-white p-6 md:p-10 space-y-8">
           {/* Title */}
           <h1 className="text-3xl font-extrabold text-gray-900">Seller Profile</h1>
 

@@ -17,10 +17,6 @@ import { authService } from "@/services/authService";
 import axios from "axios";
 import { redirect } from "react-router-dom";
 
-// outside the component
-// const stripePromise = loadStripe(
-//   "pk_test_51LWkUkEAeq2MFW6f94ApFRmNkRzMr6GKJK68CoI6VDJqjBktDUEIFmtDGGdzJouthdJ7oxe4Jft0UAH1Qk9rFgmZ00uS6aMCp4"
-// ); // <<< USE YOUR PUBLIC KEY
 const currencies = {
   // paystack: ["NGN", "USD", "GHS", "ZAR"], // Nigeria, Ghana, South Africa, USD (international cards only)
   flutterwave: [
@@ -29,40 +25,6 @@ const currencies = {
   ], // Broad African & international support
   // paypal: ["USD", "EUR", "GBP", "AUD", "CAD", "JPY"] // Major currencies supported by PayPal
 };
-
-// const exchangeRates = {
-//   usd: 1,
-//   eur: 1.1,
-//   gbp: 1.3,
-//   aud: 0.65,
-//   cad: 0.75,
-//   chf: 1.08,
-//   cny: 0.14,
-//   jpy: 0.0068,
-//   inr: 0.012,
-//   rub: 0.011,
-//   brl: 0.2,
-//   mxn: 0.058,
-//   zar: 0.055,
-//   krw: 0.00075,
-//   sgd: 0.74,
-//   hkd: 0.13,
-//   sek: 0.093,
-//   nok: 0.095,
-//   ngn: 0.0013,
-//   dkk: 0.15,
-//   pln: 0.25,
-//   try: 0.033,
-// };
-
-// function convertToUSD(amount, fromCurrency) {
-//   if (!exchangeRates[fromCurrency]) {
-//     alert(`Exchange rate for ${fromCurrency.toUpperCase()} not available.`);
-//     return null;
-//   }
-//   return amount * exchangeRates[fromCurrency];
-// }
-
 
 const paymentLogos = {
   paystack: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Paystack_Logo.png",

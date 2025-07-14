@@ -30,8 +30,8 @@ const apiRequest = async (url: string, method: string, data?: any) => {
   try {
     // For debugging in development only
     if (import.meta.env.DEV) {
-      console.log(`Making ${method} request to: ${url}`);
-      if (data) console.log('Request data:', data);
+      // console.log(`Making ${method} request to: ${url}`);
+      // if (data) console.log('Request data:', data);
     }
 
     const response = await fetch(url, {
@@ -47,7 +47,7 @@ const apiRequest = async (url: string, method: string, data?: any) => {
     
     // Log response in development
     if (import.meta.env.DEV) {
-      console.log('Response:', responseData);
+      // console.log('Response:', responseData);
     }
 
     if (!response.ok) {
@@ -65,7 +65,7 @@ const apiRequest = async (url: string, method: string, data?: any) => {
 export const ticketService = {
   createTicket: async (data: TicketData) => {
     try {
-      console.log(data)
+      // console.log(data)
       const response = await apiRequest(TICKET_ENDPOINTS.CREATE, 'POST', data);
       // toast.success("Support ticket created successfully");
       return response;

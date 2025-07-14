@@ -6,6 +6,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  acc_status?:string;
 }
 
 interface AuthContextType {
