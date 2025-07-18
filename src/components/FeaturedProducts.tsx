@@ -112,8 +112,9 @@ const FeaturedProducts = () => {
                         <p className="text-sm text-muted-foreground truncate">
                           {product.category} · {product.stock_quantity} in stock
                         </p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {truncateDescription(product.description)}
+                        <p className="text-xs text-muted-foreground line-clamp-1"
+                        dangerouslySetInnerHTML={{ __html: truncateDescription(product.description) }}
+                        >
                         </p>
                       </div>
                     </div>

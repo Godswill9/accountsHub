@@ -6,12 +6,22 @@ import { getPlatformImage } from "@/utils/platformImages";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const DigitalProducts = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const searchQuery = searchParams.get("search") || "";
+  // const searchQuery = searchParams.get("search") || "";
+const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+const [minPrice, setMinPrice] = useState<number | null>(null);
+const [maxPrice, setMaxPrice] = useState<number | null>(null);
+const [searchQuery, setSearchQuery] = useState<string>('');
+const [showFilters, setShowFilters] = useState(true);
+
+
 
   const {
     data: products,
@@ -67,29 +77,152 @@ const DigitalProducts = () => {
       return acc;
     }, {});
   }, [products]);
+  
 
-  const filteredGroups = React.useMemo(() => {
-    if (!groupedProducts) return {};
-    const filtered: { [key: string]: Product[] } = {};
+ const filteredGroups = React.useMemo(() => {
+  if (!groupedProducts) return {};
 
-    Object.entries(groupedProducts).forEach(([platform, platformProducts]) => {
-      const filteredProducts = platformProducts.filter(
-        (product) =>
-          product.platform_name
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      if (filteredProducts.length > 0) {
-        filtered[platform] = filteredProducts;
-      }
+  const filtered: { [key: string]: Product[] } = {};
+
+  Object.entries(groupedProducts).forEach(([platform, platformProducts]) => {
+    const filteredProducts = platformProducts.filter((product) => {
+      const matchesSearch =
+        product.platform_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesPlatform =
+        !selectedPlatform || product.platform_name === selectedPlatform;
+
+      const matchesCategory =
+        !selectedCategory || product.category === selectedCategory;
+
+      const matchesPrice =
+        Number(product.price) >= priceRange[0] && Number(product.price) <= priceRange[1];
+
+      return matchesSearch && matchesPlatform && matchesCategory && matchesPrice;
     });
-    return filtered;
-  }, [groupedProducts, searchQuery]);
+
+    if (filteredProducts.length > 0) {
+      filtered[platform] = filteredProducts;
+    }
+  });
+
+  return filtered;
+}, [groupedProducts, searchQuery, selectedPlatform, selectedCategory, priceRange]);
+
+
+const displayedGroups = selectedPlatform
+  ? { [selectedPlatform]: filteredGroups[selectedPlatform] || [] }
+  : filteredGroups;
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
+<div className="m-2">
+      {/* Header with toggle */}
+     <div className="flex items-center left mb-4 border-b pb-2">
+  <h2 className="text-xl font-semibold text-gray-800 tracking-tight">
+   Filter by
+  </h2>
+  <button
+    onClick={() => setShowFilters(!showFilters)}
+    className="text-sm font-medium text-blue-600 hover:text-blue-700 ml-5 transition"
+  >
+    {showFilters ? "Hide Filters" : "Show Filters"}
+  </button>
+</div>
+
+      {/* Filters */}
+      {showFilters && (
+        <div className="flex flex-wrap gap-4 items-end bg-white p-4 rounded-2xl shadow-md border">
+          {/* Platform Filter */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-600 mb-1">Platform</label>
+            <select
+              value={selectedPlatform || ""}
+              onChange={(e) =>
+                setSelectedPlatform(e.target.value === "" ? null : e.target.value)
+              }
+              className="border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Platforms</option>
+              {Object.keys(groupedProducts).map((platform) => (
+                <option key={platform} value={platform}>
+                  {platform}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-600 mb-1">Category</label>
+            <select
+              value={selectedCategory || ""}
+              onChange={(e) =>
+                setSelectedCategory(e.target.value === "" ? null : e.target.value)
+              }
+              className="border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Categories</option>
+              {[
+                "Aged Accounts",
+                "New Accounts",
+                "Verified Accounts",
+                "Unverified Accounts",
+                "High Activity Accounts",
+                "Low Activity Accounts",
+              ].map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Search Bar */}
+          <div className="flex flex-col flex-grow">
+            <label className="text-sm font-semibold text-gray-600 mb-1">Search</label>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search accounts..."
+              className="border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+            />
+          </div>
+
+          {/* Price Range */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Price Range</label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={priceRange[0]}
+                onChange={(e) =>
+                  setPriceRange([Number(e.target.value), priceRange[1]])
+                }
+                className="w-20 border border-gray-300 rounded px-2 py-1"
+                placeholder="Min"
+              />
+              <span>-</span>
+              <input
+                type="number"
+                value={priceRange[1]}
+                onChange={(e) =>
+                  setPriceRange([priceRange[0], Number(e.target.value)])
+                }
+                className="w-20 border border-gray-300 rounded px-2 py-1"
+                placeholder="Max"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+
+
       <main className="flex-grow container mx-auto px-4 py-8">
         {isLoading ? (
           <div className="space-y-4">
@@ -118,8 +251,7 @@ const DigitalProducts = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {Object.entries(filteredGroups).map(
-              ([platform, platformProducts]) => (
+           {Object.entries(displayedGroups).map(([platform, platformProducts]) => (
                 <div
                   key={platform}
                   id={platform.toLowerCase()}
@@ -163,9 +295,11 @@ const DigitalProducts = () => {
                               <h3 className="font-medium">
                                 {product.category}
                               </h3>
-                              <p className="text-sm text-gray-500">
-                                {truncateDescription(product.description)}
-                              </p>
+                          <div
+  className="text-sm text-gray-500"
+  dangerouslySetInnerHTML={{ __html: truncateDescription(product.description) }}
+/>
+
                               <span
                                 className={`block text-sm font-bold ${borderClass} mt-2`}
                               >

@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, ShoppingCart, Download, Star } from "lucide-react";
 import { authService } from "@/services/authService";
 import { getPlatformImage } from "@/utils/platformImages";
+import ReactMarkdown from "react-markdown";
 
 // Interface for PaymentDetails
 export interface PaymentDetails {
@@ -505,7 +506,7 @@ const ProductDetail = () => {
                 ))}
               </div>
 {product && (
-  sellerId ? (
+  sellerId !== "admin" ? (
     <Link
       to={`/about-seller/${sellerId}`}
       className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition mb-4"
@@ -538,20 +539,27 @@ const ProductDetail = () => {
               <div className="text-3xl font-semibold text-gray-800">
                 ${product.price}
               </div>
+<div className="bg-gray-100 p-3 rounded-md">
+  <h2 className="text-xl font-extrabold text-gray-900 bg-gray-300 p-2 rounded-md">
+    Description
+  </h2>
+  <div
+    className="mt-2 text-gray-700 prose max-w-none text-left"
+    dangerouslySetInnerHTML={{ __html: product.description }}
+  />
+</div>
 
-              <div className="bg-gray-100 p-3 rounded-md">
-                <h2 className="text-xl font-extrabold text-gray-900 bg-gray-300 p-2 rounded-md">
-                  Description
-                </h2>
-                <p className="text-gray-700 mt-2">{product.description}</p>
-              </div>
 
-              <div className="bg-red-100 p-3 rounded-md">
-                <h2 className="text-xl font-extrabold text-gray-900 bg-red-300 p-2 rounded-md">
-                  Important Notice
-                </h2>
-                <p className="text-gray-700">{product.important_notice}</p>
-              </div>
+            <div className="bg-red-100 p-3 rounded-md">
+  <h2 className="text-xl font-extrabold text-gray-900 bg-red-300 p-2 rounded-md">
+    Important Notice
+  </h2>
+  <div
+    className="text-gray-700 mt-2 text-left prose max-w-none"
+    dangerouslySetInnerHTML={{ __html: product.important_notice }}
+  />
+</div>
+
 
               {/* Purchase section */}
                    <div className="space-y-8">
