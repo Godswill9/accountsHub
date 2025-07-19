@@ -1,4 +1,7 @@
 
+/* In your global CSS file (e.g., index.css or globals.css) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 /* Base container styles */
 #root {
   /* max-width: 1280px; */
@@ -8,17 +11,17 @@
 }
 
 /* Responsive padding adjustments */
-@media (min-width: 640px) {
+/* @media (min-width: 640px) {
   #root {
-    /* padding: 1rem; */
+    padding: 1rem;
   }
 }
 
 @media (min-width: 768px) {
   #root {
-    /* padding: 2rem; */
+    padding: 2rem;
   }
-}
+} */
 
 /* Animation keyframes */
 @keyframes logo-spin {

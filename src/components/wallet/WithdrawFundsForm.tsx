@@ -447,7 +447,7 @@ const onSubmit = async () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="bank">Bank Transfer</SelectItem>
+                        <SelectItem value="bank">Bank Transfer (Nigerians Only)</SelectItem>
                         <SelectItem value="paypal">PayPal</SelectItem>
                         <SelectItem value="payoneer">Payoneer</SelectItem>
                         <SelectItem value="crypto">Cryptocurrency</SelectItem>

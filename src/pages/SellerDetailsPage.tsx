@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BadgeCheck, MapPin, Truck, RefreshCw, AlertTriangle, Star, MessageCircle, Link } from "lucide-react";
+import { BadgeCheck, MapPin, Truck, RefreshCw, AlertTriangle, Star, MessageCircle, Link, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPlatformImage } from "@/utils/platformImages";
 
@@ -91,6 +91,11 @@ const SellerDetailsPage = () => {
 const [sellerListings, setSellerListings]= useState<Listing[]>([])
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  
+  useEffect(() => {
     async function loadSeller() {
       setLoading(true);
       console.log(sellerId)
@@ -166,10 +171,20 @@ return (
                   <span className="font-medium">Language:</span>
                   <span>{seller.preferred_language}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Account Status:</span>
-                  <span className="text-green-600">{seller.acc_status}</span>
-                </div>
+     <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-xl border border-gray-200 shadow-sm max-w-xs">
+  <span className="text-sm font-semibold text-gray-700">Account Status:</span>
+  {seller.acc_status === "Okay" ? (
+    <div className="flex items-center gap-1 text-green-600">
+      <CheckCircle className="w-4 h-4" />
+      <span className="text-sm font-medium">Verified Seller</span>
+    </div>
+  ) : (
+    <div className="flex items-center gap-1 text-yellow-600">
+      <AlertTriangle className="w-4 h-4" />
+      <span className="text-sm font-medium">Unverified</span>
+    </div>
+  )}
+</div>
               </div>
 
               {/* Listings */}
@@ -184,20 +199,35 @@ return (
                   <p className="text-muted-foreground text-sm">No listings available</p>
                 ) : (
                   <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                   {sellerListings.map((item) => (
-  <a key={item.id} href={`/digital-products/${item.id}`}>
-    <div className="p-4 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md cursor-pointer transition">
+                 {sellerListings.map((item) => (
+  <a
+    key={item.id}
+    href={`/digital-products/${item.id}`}
+    className="block group transition-transform hover:scale-[1.01]"
+  >
+    <div className="p-4 bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
+      <div className="flex items-center gap-3 mb-3">
         <img
-        src={getPlatformImage(item.platform_name)}
-        alt={item.platform_name}
-        className="w-6 h-6 object-contain"
-    />
-      <h3 className="text-lg font-semibold text-gray-800">{item.platform_name}</h3>
-      <p className="text-sm text-gray-600">{item.category}</p>
-      <p className="text-sm text-gray-600">{item.stock_quantity}</p>
-      <p className="text-base text-black font-bold mt-2">${item.price}</p>
+          src={getPlatformImage(item.platform_name)}
+          alt={item.platform_name}
+          className="w-8 h-8 object-contain"
+        />
+        <div>
+          <h3 className="text-base font-semibold text-gray-800 group-hover:text-blue-600">
+            {item.platform_name}
+          </h3>
+          <p className="text-xs text-gray-500 capitalize">{item.category}</p>
+        </div>
+      </div>
+      <div className="flex justify-between items-center text-sm text-gray-600">
+        <span>Stock:</span>
+        <span className="font-medium text-gray-700">{item.stock_quantity}</span>
+      </div>
+      <div className="mt-3 text-right">
+        <span className="text-lg font-bold text-green-700">${item.price}</span>
+      </div>
     </div>
- </a>
+  </a>
 ))}
 
                   </div>

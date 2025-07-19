@@ -76,13 +76,13 @@ const WalletPage: React.FC = () => {
     const fetchAuthStatus = async () => {
       try {
         const response = await checkAuthStatus();
-        console.log("Auth status response:", response); // Log the response here
+        // console.log("Auth status response:", response); // Log the response here
         setLoading(false);
         setUserEmail(response.email || "");
         setUserName(response.fullName || "user");
         const userDetails = response.id;
         setUserId(userDetails);
-        console.log(userDetails);
+        // console.log(userDetails);
         if (!userDetails) {
           toast({
             variant: "destructive",
@@ -120,7 +120,7 @@ const WalletPage: React.FC = () => {
               user_id: payment.user_id,
             }));
 
-            console.log(paymentsData.payments)
+            // console.log(paymentsData.payments)
 
           setTransactions(formattedTransactions);
         } catch (error) {
@@ -181,7 +181,7 @@ const WalletPage: React.FC = () => {
 
 const getRate = async (from, to) => {
   const res = await axios.get(`https://v6.exchangerate-api.com/v6/541b3e2b6983ed52d20e9f8e/pair/${from}/${to}`);
-  console.log("Exchange rate response:", res.data);
+  // console.log("Exchange rate response:", res.data);
   return res.data.conversion_rate;
 };
 
@@ -338,12 +338,12 @@ const getRate = async (from, to) => {
                 }
               />
 
-              <div className="mt-4 flex justify-end">
+              {/* <div className="mt-4 flex justify-end">
                 <button className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
                   <ArrowUpDown className="h-4 w-4 mr-1" />
                   Refresh balance
                 </button>
-              </div>
+              </div> */}
             </div>
 
             <Tabs defaultValue="transactions" className="w-full">

@@ -101,7 +101,14 @@ const OrderList: React.FC<OrderListProps> = ({ orders, messagesCount }) => {
           </Badge>
         </TableCell>
         <TableCell>${Number(order.amount).toFixed(2)}</TableCell>
-        <TableCell>{Number(order.quantity)} accounts</TableCell>
+       <TableCell>
+  {Number(order.quantity) > 1
+    ? `${Number(order.quantity)} accounts`
+    : Number(order.quantity) === 1
+    ? "1 account"
+    : ""}
+</TableCell>
+
         <TableCell className="text-right flex items-center justify-end gap-2">
   <Link to={`/order/${order.order_id}`}>
     <Button

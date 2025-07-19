@@ -45,7 +45,7 @@ const Hero = () => {
           {/* </div> */}
 
           {/* Search bar */}
-          <form
+          {/* <form
             onSubmit={handleSearch}
             className="mt-4 md:mt-8 max-w-2xl mx-auto relative"
           >
@@ -65,7 +65,7 @@ const Hero = () => {
                 <span className="ml-2">Search</span>
               </button>
             </div>
-          </form>
+          </form> */}
 
           {/* Category pills - replaced with social media platforms */}
           <div className="flex flex-wrap justify-center mt-6 gap-2 px-2">

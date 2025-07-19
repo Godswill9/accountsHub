@@ -18,6 +18,12 @@ const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
     const [messagesCount, setMessagesCount] = useState<Record<string, number>>({});
 
+
+
+      useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, []);
+    
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
@@ -54,12 +60,16 @@ const OrdersPage: React.FC = () => {
 
   const fetchOrders = async (id: string) => {
     try {
-      const data = await getOrders(id);
-      // console.log(data.order);
-      setOrders(data.order || []);
+     const data = await getOrders(id);
+
+// Sort by created_at descending (newest first)
+const sortedOrders = (data.order || []).sort(
+  (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+);
+
+setOrders(sortedOrders);
     } catch (error) {
       toast({
-        variant: "destructive",
         title: "Failed to load orders",
         description:
           "There was an error loading your orders. Please refresh the page.",

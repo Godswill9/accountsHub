@@ -89,8 +89,7 @@ const SignupForm = () => {
   if (data.message === "User registered and email sent") {
     toast({
       title: "Success",
-      description: "Signup successful. Check your email for the code.",
-      variant: "success",
+      description: "Signup successful. Check your email for the code."
     });
     setVerificationStep(true);
     return;
@@ -122,14 +121,22 @@ const SignupForm = () => {
         return;
       }
 try {
-  await verifyCode(email, code);
-  toast({
+  await verifyCode(email, code).then((res)=>{
+    if(res.status === "disallowed"){
+       toast({
+    title: "Error",
+    description: res.message,
+     variant: "destructive",
+  })}
+  else{
+     toast({
     title: "Success",
     description: "Your account has been verified.",
   });
-
-  // ✅ Add a short delay (optional UX polish)
+  
   setTimeout(() => navigate("/"), 1000);
+  }
+  })
 } catch (error) {
   toast({
     title: "Error",
@@ -314,7 +321,7 @@ try {
 
       {!verificationStep && (
         <>
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-gray-300" />
             </div>
@@ -323,7 +330,7 @@ try {
                 Or continue with
               </span>
             </div>
-          </div>
+          </div> */}
 
           {/* <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" type="button" className="w-full">

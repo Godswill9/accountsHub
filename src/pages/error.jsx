@@ -1,11 +1,17 @@
 import { Link, useLocation } from 'react-router-dom';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useEffect } from 'react';
 
 const ErrorPage = () => {
 //   const history = useHistory();
   const location = useLocation();
   const errorMessage = new URLSearchParams(location.search).get("errorMessage");
+
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -79,6 +79,11 @@ const totalUnreadConversations = Object.keys(unreadCounts).length;
     checkAuthStatus();
   }, []);
 
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
+
 useEffect(() => {
   const fetchUnreadCounts = async () => {
     const counts: Record<string, number> = {};
@@ -265,16 +270,15 @@ useEffect(() => {
                 No tickets found
               </h3>
               <p className="text-gray-500 mb-6">
-                You haven't created any support tickets yet. Click the button
-                below to get help.
+                You haven't created any support tickets yet.
               </p>
-              <Button
+              {/* <Button
                 onClick={handleCreateTicket}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Create First Ticket
-              </Button>
+              </Button> */}
             </CardContent>
           </Card>
         )}

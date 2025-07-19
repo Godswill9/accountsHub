@@ -15,6 +15,7 @@ import {
   getNotifications
 } from "@/services/notificationService";
 import { getOrders } from "@/services/orderService";
+import axios from "axios";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,12 +31,56 @@ const totalUnread = Object.values(unreadCounts).reduce((sum, count) => sum + cou
 const totalUnreadConversations = Object.keys(unreadCounts).length;
 const [accountBanStatus, setAccountBanStatus] = useState(false)
 const [accountSuspendedStatus,setAccountSuspendedStatus] = useState(false)
+   const [messagesCount, setMessagesCount] = useState<Record<string, number>>({});
 
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     navigate(`/digital-products?search=${encodeURIComponent(searchQuery)}`);
   };
+
+   const fetchMessagesFromId = async (orderId: string) => {
+  try {
+    const res = await axios.get(
+      `https://aitool.asoroautomotive.com/api/${orderId}`
+    );
+
+    const unseenFromSeller = res.data.filter(
+      (msg: any) => msg.seen_by_receiver === 0 && msg.sender_role === 'seller'
+    );
+
+    // console.log("Unseen messages from seller:", unseenFromSeller);
+
+    setMessagesCount(prev => ({
+      ...prev,
+      [orderId]: unseenFromSeller.length
+    }));
+  } catch (err) {
+    console.error("Error fetching seller messages", err);
+  }
+};
+
+const unreadConversationsCount = Object.values(messagesCount).filter(
+  (count) => count > 0
+).length;
+
+// console.log(unreadConversationsCount)
+
+
+   const fetchMessages= async(sellerId: string)=>{
+       try {
+        const res = await axios.get(
+          `https://aitool.asoroautomotive.com/api/conversations/${sellerId}`
+        );
+       
+        return res.data.conversations
+      } catch (err) {
+        console.error("Error fetching seller messages", err);
+      } finally {
+        // setLoading(false);
+      }
+  }
+
 
   useEffect(() => {
     // console.log(isAuthenticated);
@@ -60,6 +105,12 @@ setAccountSuspendedStatus(isSuspended);
            await fetchOrders(response.id)
           await  fetchPayments(response.id)
            await fetchAllTickets(response.id)
+
+            const allOrdersWithMessages = await fetchMessages(response.id)
+        //  console.log(allOrdersWithMessages)
+         allOrdersWithMessages.forEach((item, i)=>{
+          fetchMessagesFromId(item.order_id)
+         })
         }
       } catch (error) {
         console.error("Authentication error", error);
@@ -149,7 +200,7 @@ useEffect(() => {
 
 
   return (
-    <header className="w-full bg-white shadow-sm">
+   <header className="w-full bg-white shadow-sm sticky top-0 z-50">
     {accountBanStatus && (
   <div className="fixed top-0 left-0 w-full z-50 bg-red-600 text-white text-sm sm:text-base font-medium px-4 py-2 shadow-md flex items-center justify-center gap-2">
     <AlertTriangle className="w-4 h-4" />
@@ -274,6 +325,11 @@ useEffect(() => {
       {orders.length}
     </span>
   )}
+  {unreadConversationsCount > 0 && (
+    <span className="absolute top-3 right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-yellow-600 rounded-full">
+      {unreadConversationsCount}
+    </span>
+  )}
 </Link>
 
 <Link
@@ -348,6 +404,11 @@ useEffect(() => {
       {orders.length}
     </span>
   )}
+  {unreadConversationsCount > 0 && (
+    <span className="absolute -top-1 -right-5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-yellow-600 rounded-full">
+      {unreadConversationsCount}
+    </span>
+  )}
 </Link>
 
 <Link
@@ -390,7 +451,7 @@ useEffect(() => {
             </div>
             <div className="md:hidden flex items-center space-x-2">
               {isAuthenticated && <WalletButton />}
-              <SupportTicketButton unread={Object.keys(unreadCounts).length}/>
+              {isAuthenticated && <SupportTicketButton unread={Object.keys(unreadCounts).length}/>}
             </div>
           </nav>
         </div>

@@ -6,6 +6,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/authService";
 
 const SuccessPage = () => {
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
   //   const history = useHistory();
   const location = useLocation();
   //   const { checkAuthStatus } = useAuth();

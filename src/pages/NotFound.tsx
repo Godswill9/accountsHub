@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/button";
 const NotFound = () => {
   const location = useLocation();
 
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
+  
   useEffect(() => {
     console.error(
       "404 Error: User attempted to access non-existent route:",

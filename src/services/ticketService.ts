@@ -93,7 +93,7 @@ export const ticketService = {
       );
       return response.ticket;
     } catch (error: any) {
-      toast.error(error.message || "Failed to fetch tickets");
+      // toast.error(error.message || "Failed to fetch tickets");
       throw error;
     }
   },

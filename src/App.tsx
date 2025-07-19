@@ -32,6 +32,8 @@ import VerifyPaymentPage from "./pages/loading";
 import SellerDetailsPage from "./pages/SellerDetailsPage";
 import BannedPage from "./pages/BannedPage";
 import ProtectedRoute from "@/pages/ProtectedRoute"; // adjust path
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 
 // Create a Client once for the entire application
@@ -201,6 +203,9 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+<Route path="/terms" element={<TermsAndConditions />} />
+
 
               {/* Catch-All */}
               <Route path="*" element={<NotFound />} />

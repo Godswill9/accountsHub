@@ -10,6 +10,7 @@ import { ArrowLeft, ShoppingCart, Download, Star } from "lucide-react";
 import { authService } from "@/services/authService";
 import { getPlatformImage } from "@/utils/platformImages";
 import ReactMarkdown from "react-markdown";
+import ImageCarouselViewer from "@/components/ImageCarouselViewer";
 
 // Interface for PaymentDetails
 export interface PaymentDetails {
@@ -59,15 +60,24 @@ const ProductDetail = () => {
   const [totalPriceValue, settotalPriceValue] = useState(0); // State to store the input value
   const [carouselImages, setCarouselImages] = useState([]);
     const [isBanned, setIsBanned] = useState(false);
+    const [showThankYou, setShowThankYou] = useState(false);
+    const [loading, setLoading] = useState(false)
+
+const showOrderThankYouPopup = () => {
+  setShowThankYou(true);
+  setTimeout(() => setShowThankYou(false), 4000); // auto close after 4s
+};
+
 
   const handleDownloadClick = () => {
     setShowInput(true); // Show the input and button when "Download Sample" is clicked
   };
 
+
   useEffect(() => {
-    // Scroll to the top of the page when the component is mounted
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
 
   const handleLogInput = () => {
     console.log(inputValue); // Log the entered number
@@ -251,7 +261,7 @@ const ProductDetail = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log("order created successfuflly:", data);
+        // console.log("order created successfuflly:", data);
         await createConversation({order_id: data.order_id, buyer_id: orderData.buyer_id, seller_id: orderData.seller_id, product_id: orderData.item_id});
       } else {
         console.error("❌ Error saving payment:", data.message);
@@ -262,6 +272,11 @@ const ProductDetail = () => {
   };
 
   async function createPayment() {
+    if(!userId || userId ===" "){
+      alert("Login and fund wallet to Purchase")
+      return;
+    }
+    setLoading(true)
     if (couponValue.length === 15) {
       // Coupon validation
       try {
@@ -296,10 +311,7 @@ const ProductDetail = () => {
         );
         const data2 = await response2.json();
         if (data2.message === "Funds transferred successfully") {
-          alert("Payment received. View details in orders page");
-          setTimeout(()=>{
-            window.location.reload
-          }, 1000)
+          // alert("Payment received. View details in orders page");
           // await downloadfetchAcc(inputValue);
           await updateCouponCode(data.id, userId);
           await savePayment({
@@ -346,10 +358,7 @@ const ProductDetail = () => {
 
         const data = await response.json();
         if (data.message === "Funds transferred successfully") {
-          alert("Payment received. View details in orders page");
-          setTimeout(()=>{
-            window.location.reload
-          }, 1000)
+          // alert("Payment received. View details in orders page");
           // await downloadfetchAcc(inputValue);
           savePayment({
             payment_type: "order",
@@ -440,7 +449,14 @@ const ProductDetail = () => {
 
       const data = await response.json();
       if (data.success) {
-        console.log("✅ Message sent successfully:", data);
+          setLoading(false)
+        // console.log("✅ Message sent successfully:", data);
+          setTimeout(()=>{
+            showOrderThankYouPopup()
+          }, 10)
+        setTimeout(() => {
+  window.location.href = "/orders"; 
+}, 200);
       } else {
         console.error("❌ Error sending message:", data.message);
       }
@@ -495,18 +511,10 @@ const ProductDetail = () => {
               </div>
 
               {/* Carousel container */}
-              <div className="w-full max-w-md overflow-x-auto flex gap-4 rounded-lg p-2 border border-gray-300 shadow-inner scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-                {carouselImages.map((img, index) => (
-                  <img
-                    key={index}
-                    src={img}
-                    alt={`${product.platform_name} screenshot ${index + 1}`}
-                    className="h-56 w-auto object-cover rounded-lg shadow-md flex-shrink-0 transition-transform duration-300 hover:scale-105 border border-gray-300"
-                  />
-                ))}
-              </div>
+            <ImageCarouselViewer images={carouselImages} />
+
 {product && (
-  sellerId !== "admin" ? (
+  sellerId !== "admin" && sellerId !== null ? (
     <Link
       to={`/about-seller/${sellerId}`}
       className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition mb-4"
@@ -549,16 +557,27 @@ const ProductDetail = () => {
   />
 </div>
 
+{product.important_notice?.trim() && (
+  <div className="bg-red-100 p-3 rounded-md">
+    <h2 className="text-xl font-extrabold text-gray-900 bg-red-300 p-2 rounded-md">
+      Important Notice
+    </h2>
+    <div
+      className="text-gray-700 mt-2 text-left prose max-w-none"
+      dangerouslySetInnerHTML={{ __html: product.important_notice }}
+    />
+  </div>
+)}
 
-            <div className="bg-red-100 p-3 rounded-md">
-  <h2 className="text-xl font-extrabold text-gray-900 bg-red-300 p-2 rounded-md">
-    Important Notice
-  </h2>
-  <div
-    className="text-gray-700 mt-2 text-left prose max-w-none"
-    dangerouslySetInnerHTML={{ __html: product.important_notice }}
-  />
+       <div className="p-5 rounded-xl bg-gray-50 border border-gray-200 shadow-sm">
+  <div className="flex items-center justify-between mb-3">
+    <h2 className="text-lg font-bold text-gray-800">Data Format</h2>
+    <span className="inline-block text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-medium border border-blue-200">
+      {product.data_format || "Email & Password"}
+    </span>
+  </div>
 </div>
+
 
 
               {/* Purchase section */}
@@ -667,6 +686,46 @@ const ProductDetail = () => {
           </div>
         )}
       </main>
+{showThankYou && (
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div
+      className="relative bg-cover bg-center rounded-2xl shadow-xl max-w-sm w-full p-6 text-center text-white overflow-hidden"
+      style={{
+        backgroundImage:
+          "url('https://accountshub.onrender.com/lovable-uploads/b8bc2363-f8b3-49a4-bec6-1490e3aa106a-removebg-preview.png')",
+      }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-blue-400 bg-opacity-100 rounded-2xl"></div>
+
+      {/* Content */}
+      <div className="relative z-10 space-y-4">
+        <h2 className="text-2xl font-bold">Thank you! 😊</h2>
+        <p className="text-sm">
+          Order placed! We’ll email you shortly. ✨
+        </p>
+        <button
+          onClick={() => setShowThankYou(false)}
+          className="mt-2 px-4 py-2 bg-white text-blue-800 font-semibold rounded hover:bg-gray-200"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{loading && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-white font-medium">Loading...</p>
+    </div>
+  </div>
+)}
+
+
+
+
 
       <Footer />
     </div>

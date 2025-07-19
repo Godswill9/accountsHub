@@ -9,6 +9,12 @@ const VerifyPaymentPage = () => {
 
   const [status, setStatus] = useState("loading"); // "loading", "success", "failed"
   const [details, setDetails] = useState(null);
+
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
+    
 useEffect(() => {
   const verifyPayment = async () => {
     try {

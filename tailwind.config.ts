@@ -115,7 +115,10 @@ export default {
       boxShadow: {
         // neumorphic: '10px 10px 20px #d1d9e6, -10px -10px 20px #ffffff'
 		 neumorphic: '4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff',
-      }
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'], // replace 'Poppins' with your font
+      },
     }
   },
   plugins: [require("tailwindcss-animate")],

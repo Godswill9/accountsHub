@@ -41,6 +41,12 @@ const ChatPage: React.FC = () => {
     checkAuthStatus();
   }, [navigate]);
 
+
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
+    
   // Load messages when both ticketId and userId are ready
   useEffect(() => {
     if (!ticketId || !userId) return; // Do not proceed if ticketId or userId is not available

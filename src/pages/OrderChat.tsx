@@ -81,6 +81,12 @@ const OrderChatPage: React.FC = () => {
     checkAuthStatus();
   }, [navigate]);
 
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
+    
+
   function getMimeTypeFromExtension(ext: string) {
   switch (ext.toLowerCase()) {
     case "jpg":
@@ -312,7 +318,7 @@ const handleAcceptClose = async (order_id) => {
         { withCredentials: true }
       );
 
-      if (completeRes.data.message === "Order completion date updated") {
+      if (completeRes.data.message === "Order updated, seller sales increased, stock reduced") {
         toast.success("Order completed successfully");
       } else {
         console.error("❌ Failed to complete order:", completeRes.data.message);
@@ -402,16 +408,17 @@ return (
           onSendMessage={handleSendMessage}
           onSendFiles={(content, files) => handleSendFiles(content, files)}
           userId={userId || ""}
+          status={chatStatus}
         />
 
         {/* Overlay for Closed */}
-        {chatStatus === "closed" && (
+        {/* {chatStatus === "closed" && (
           <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-center px-4">
             <MessageCircle className="h-10 w-10 text-gray-400 mb-3" />
             <h2 className="text-xl font-semibold text-gray-700 mb-2">Conversation Closed</h2>
             <p className="text-gray-500">This conversation is no longer active.</p>
           </div>
-        )}
+        )} */}
       </div>
     </main>
 

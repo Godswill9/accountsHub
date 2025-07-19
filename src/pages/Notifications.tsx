@@ -40,13 +40,18 @@ const NotificationsPage: React.FC = () => {
     checkAuthStatus();
   }, []);
 
+
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
+    
   const fetchNotifications = async (id) => {
     try {
       const data = await getNotifications(id);
       setNotifications(data || []);
     } catch (error) {
       toast({
-        variant: "destructive",
         title: "Failed to load notifications",
         description: "There was an error loading your notifications.",
       });
@@ -90,16 +95,19 @@ const NotificationsPage: React.FC = () => {
               Stay updated with the latest notifications
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+          {
+            notifications.length !== 0?(   
+            <div className="flex gap-2">
+            {/* <Button variant="outline" size="sm">
               <Filter className="h-4 w-4 mr-1" />
               Filter
-            </Button>
+            </Button> */}
             <Button variant="destructive" size="sm" onClick={handleDeleteAll}>
               <Trash2 className="h-4 w-4 mr-1" />
               Delete All
             </Button>
-          </div>
+          </div>):(<></>)
+          }
         </div>
 
         {loading ? (

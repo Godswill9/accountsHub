@@ -1,86 +1,82 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, ChevronRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   return (
-    <footer className="bg-white">
-      <div className="container-custom py-12">
-        {/* Main footer links */}
-        <div className="grid md:grid-cols-6 gap-8">
+    <footer className="bg-white border-t border-gray-200">
+      <div className="container-custom py-16">
+        <div className="grid md:grid-cols-6 gap-10">
+          {/* Logo + About */}
           <div className="md:col-span-2">
             <a href="/" className="block mb-4">
               <span className="text-2xl font-bold text-flippa-navy">Accounts Hub.</span>
             </a>
-            <p className="text-gray-600 text-sm mb-4">
-              The #1 platform to buy and sell Social Media, trusted by over 3 million entrepreneurs.
+            <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+              The leading platform to buy and sell verified social media accounts — trusted by over 3 million entrepreneurs worldwide.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
-                <span className="text-gray-600 text-sm">F</span>
+            <div className="flex space-x-3 mt-4">
+              <a href="#" aria-label="Facebook" className="text-gray-600 hover:text-blue-600 transition">
+                <Facebook size={20} />
               </a>
-              <a href="#" className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
-                <span className="text-gray-600 text-sm">T</span>
+              <a href="#" aria-label="Twitter" className="text-gray-600 hover:text-blue-500 transition">
+                <Twitter size={20} />
               </a>
-              <a href="#" className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
-                <span className="text-gray-600 text-sm">L</span>
+              <a href="#" aria-label="Instagram" className="text-gray-600 hover:text-pink-500 transition">
+                <Instagram size={20} />
               </a>
-              <a href="#" className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
-                <span className="text-gray-600 text-sm">I</span>
+              <a href="#" aria-label="LinkedIn" className="text-gray-600 hover:text-blue-700 transition">
+                <Linkedin size={20} />
               </a>
             </div>
           </div>
-          
+
+          {/* Sell Section */}
           <div>
-            <h4 className="font-bold mb-4">Buy</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Instagram</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Facebook</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Telegram</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Email</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Snapchat</a></li>
-            </ul>
+            <h4 className="text-gray-900 font-semibold mb-4">Start Selling</h4>
+            <p className="text-sm text-gray-600 mb-3">
+              Ready to cash out? Create a seller account and list your digital asset in minutes.
+            </p>
+            <Button variant="default" className="text-sm font-medium px-4 py-2" asChild>
+              <a href="https://accountshubsellers.onrender.com/" className="flex items-center gap-2">
+                Start Selling <ChevronRight size={16} />
+              </a>
+            </Button>
           </div>
-          
-          <div>
-            <h4 className="font-bold mb-4">Sell</h4>
+
+          {/* Company Links */}
+          {/* <div>
+            <h4 className="text-gray-900 font-semibold mb-4">Company</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Instagram</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Facebook</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Telegram</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Email</a></li>
+              <li><a href="/about" className="text-sm text-gray-600 hover:text-flippa-blue transition">About Us</a></li>
+              <li><a href="/contact" className="text-sm text-gray-600 hover:text-flippa-blue transition">Contact</a></li>
+              <li><a href="/careers" className="text-sm text-gray-600 hover:text-flippa-blue transition">Careers</a></li>
+              <li><a href="/blog" className="text-sm text-gray-600 hover:text-flippa-blue transition">Blog</a></li>
             </ul>
-          </div>
-          
+          </div> */}
+
+          {/* Legal Links */}
           <div>
-            <h4 className="font-bold mb-4">Resources</h4>
+            <h4 className="text-gray-900 font-semibold mb-4">Legal</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Blog</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Podcast</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Help Center</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Pricing</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Affiliate Program</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-bold mb-4">Company</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">About Us</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Careers</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Press</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Contact</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-flippa-blue text-sm">Terms of Service</a></li>
+              <li><a href="/terms" className="text-sm text-gray-600 hover:text-flippa-blue transition">Terms of Service</a></li>
+              <li><a href="/privacy" className="text-sm text-gray-600 hover:text-flippa-blue transition">Privacy Policy</a></li>
             </ul>
           </div>
         </div>
-        
-        <div className="mt-12 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between">
-          <p className="text-sm text-gray-500">&copy; 2025 Accounts Hub.com Pty Ltd. All rights reserved.</p>
-          <div className="mt-4 md:mt-0 flex space-x-4">
-            <a href="#" className="text-sm text-gray-500 hover:text-flippa-blue">Privacy Policy</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-flippa-blue">Terms of Service</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-flippa-blue">Cookie Policy</a>
+
+        {/* Footer Bottom */}
+        <div className="mt-12 pt-6 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-gray-500 text-center">
+            &copy; {new Date().getFullYear()} AccountsHub.com. All rights reserved.
+          </p>
+          <div className="flex space-x-4">
+            <a href="/privacy" className="text-sm text-gray-500 hover:text-flippa-blue transition">
+              Privacy Policy
+            </a>
+            <a href="/terms" className="text-sm text-gray-500 hover:text-flippa-blue transition">
+              Terms of Service
+            </a>
           </div>
         </div>
       </div>

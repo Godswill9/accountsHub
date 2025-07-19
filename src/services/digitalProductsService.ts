@@ -14,6 +14,7 @@ export interface Product {
 important_notice: string;
 images?: string[];
 seller_id: string;
+data_format?:string
 }
 
 export const DIGITAL_PRODUCTS_ENDPOINTS = {

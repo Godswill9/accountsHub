@@ -67,7 +67,7 @@ const TicketPage: React.FC = () => {
         }
       } catch (error) {
         console.error("Authentication error", error);
-        toast.error("Authentication error");
+        // toast.error("Authentication error");
         // navigate("/login");
         return null;
       }
@@ -75,6 +75,11 @@ const TicketPage: React.FC = () => {
 
     checkAuthStatus();
   }, []);
+
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+  
 
   const handleSendMessage = async (
     content: string,

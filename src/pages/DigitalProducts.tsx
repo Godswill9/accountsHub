@@ -12,16 +12,21 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 const DigitalProducts = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  // const searchQuery = searchParams.get("search") || "";
+  const searchQuery2 = searchParams.get("search") || "";
 const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
 const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
 const [minPrice, setMinPrice] = useState<number | null>(null);
 const [maxPrice, setMaxPrice] = useState<number | null>(null);
 const [searchQuery, setSearchQuery] = useState<string>('');
-const [showFilters, setShowFilters] = useState(true);
+const [showFilters, setShowFilters] = useState(false);
+const [filtered, setFiltered] = useState({});
 
 
+
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, []);
 
   const {
     data: products,
@@ -45,7 +50,7 @@ const [showFilters, setShowFilters] = useState(true);
     return description;
   };
 
-  // Updated scroll behavior
+  // // Updated scroll behavior
   // useEffect(() => {
   //   if (location.hash) {
   //     const element = document.querySelector(location.hash);
@@ -78,6 +83,27 @@ const [showFilters, setShowFilters] = useState(true);
     }, {});
   }, [products]);
   
+
+//   useEffect(() => {
+//   const newFiltered: Record<string, any[]> = {};
+
+//   Object.entries(groupedProducts).forEach(([platform, platformProducts]) => {
+//     const filteredProducts = platformProducts.filter((product) => {
+//       const matchesSearch =
+//         product.platform_name?.toLowerCase().includes(searchQuery2.toLowerCase()) ||
+//         product.description?.toLowerCase().includes(searchQuery2.toLowerCase());
+
+//       return matchesSearch;
+//     });
+
+//     if (filteredProducts.length > 0) {
+//       newFiltered[platform] = filteredProducts;
+//     }
+//   });
+
+//   setFiltered(newFiltered);
+// }, [searchQuery2, groupedProducts]);
+
 
  const filteredGroups = React.useMemo(() => {
   if (!groupedProducts) return {};
@@ -119,7 +145,7 @@ const displayedGroups = selectedPlatform
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
-<div className="m-2">
+<div className="fixed top-[22vh] min-[1000px]:top-[21vh] left-0 p-1 right-0 m-2 z-50 bg-white">
       {/* Header with toggle */}
      <div className="flex items-center left mb-4 border-b pb-2">
   <h2 className="text-xl font-semibold text-gray-800 tracking-tight">
@@ -195,17 +221,20 @@ const displayedGroups = selectedPlatform
 
           {/* Price Range */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Price Range</label>
+            <label className="block text-sm font-medium text-gray-700">Price Range ($)</label>
             <div className="flex gap-2">
-              <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) =>
-                  setPriceRange([Number(e.target.value), priceRange[1]])
-                }
-                className="w-20 border border-gray-300 rounded px-2 py-1"
-                placeholder="Min"
-              />
+            <input
+  type="number"
+  min={1}
+  value={priceRange[0]}
+  onChange={(e) => {
+    const value = Math.max(1, Number(e.target.value));
+    setPriceRange([value, priceRange[1]]);
+  }}
+  className="w-20 border border-gray-300 rounded px-2 py-1"
+  placeholder="Min"
+/>
+
               <span>-</span>
               <input
                 type="number"
@@ -223,7 +252,7 @@ const displayedGroups = selectedPlatform
     </div>
 
 
-      <main className="flex-grow container mx-auto px-4 py-8">
+     <main className="flex-grow container mx-auto px-4 py-24">
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
