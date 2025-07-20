@@ -17,6 +17,7 @@ const VerifyPaymentPage = () => {
     
 useEffect(() => {
   const verifyPayment = async () => {
+    localStorage.setItem("transactionId", transactionId)
     try {
       const res = await fetch(`https://aitool.asoroautomotive.com/api/flutterwave/verify?transaction_id=${transactionId}`);
       const data = await res.json();

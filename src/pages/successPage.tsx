@@ -62,8 +62,7 @@ const transactionId = query.get("transaction_id");
   }, []);
 
 const realVerify = async (id) => {
-  const query = new URLSearchParams(window.location.search);
-  const transactionId = query.get("transaction_id");
+  const transactionId = localStorage.getItem("transactionId")
 
   // ✅ Handle missing transaction_id
  if (!transactionId) {
