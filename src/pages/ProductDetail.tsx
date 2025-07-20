@@ -336,9 +336,12 @@ const showOrderThankYouPopup = () => {
         } else {
           alert(data2.error);
           console.log(data2);
+          setLoading(false)
         }
       } catch (error) {
+        alert(error.message)
         console.log(error.message);
+         setLoading(false)
       }
     } else {
       try {
@@ -382,8 +385,11 @@ const showOrderThankYouPopup = () => {
         } else {
           alert(data.error)
           console.log(data);
+           setLoading(false)
         }
       } catch (error) {
+         setLoading(false)
+         alert(error.message)
         console.log(error.message);
       }
     }
