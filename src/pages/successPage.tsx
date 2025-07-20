@@ -89,8 +89,13 @@ const realVerify = async (id) => {
       localStorage.setItem("currentPayment", "");
       localStorage.setItem("paymentDetails", "");
       localStorage.setItem("accountDetails", "");
+      localStorage.setItem("transactionId", "");
+      setTimeout(()=>{
+          window.location.href = `/error?reason=payment_failed`;
+      }, 1000)
     } else {
       verifyPayment(id);
+        localStorage.setItem("transactionId", "");
     }
   } catch (err) {
     console.error("Verification error:", err);
