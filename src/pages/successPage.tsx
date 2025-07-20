@@ -45,7 +45,8 @@ const SuccessPage = () => {
         if (!userDetails) {
           return;
         }
-        verifyPayment(userDetails);
+        realVerify(userDetails)
+        // verifyPayment(userDetails);
       } catch (error) {
         console.error("Error in fetching auth status:", error);
       }
@@ -59,6 +60,44 @@ setRef(txRef || ""); // Set ref from URL query parameter
 const transactionId = query.get("transaction_id");
 
   }, []);
+
+const realVerify = async (id) => {
+  const query = new URLSearchParams(window.location.search);
+  const transactionId = query.get("transaction_id");
+
+  // ✅ Handle missing transaction_id
+ if (!transactionId) {
+  alert("No transaction found. If you just paid, please check your email or try again.");
+  return;
+}
+
+  try {
+    const response = await fetch(
+      `https://aitool.asoroautomotive.com/api/flutterwave/verify?transaction_id=${transactionId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json();
+    console.log(data);
+
+    if (data.status === "failed") {
+      localStorage.setItem("currentPayment", "");
+      localStorage.setItem("paymentDetails", "");
+      localStorage.setItem("accountDetails", "");
+    } else {
+      verifyPayment(id);
+    }
+  } catch (err) {
+    console.error("Verification error:", err);
+  }
+};
+
 
   const verifyPayment = async (id: String) => {
     if (

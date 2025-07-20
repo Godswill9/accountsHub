@@ -11,6 +11,12 @@ const ErrorPage = () => {
     useEffect(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }, []);
+
+    useEffect(()=>{
+         localStorage.setItem("currentPayment", "");
+          localStorage.setItem("paymentDetails", "");
+          localStorage.setItem("accountDetails", "");
+    },[])
   
 
   return (
