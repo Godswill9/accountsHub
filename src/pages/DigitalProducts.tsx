@@ -147,7 +147,6 @@ const displayedGroups = selectedPlatform
       <Header />
 <div className="
   fixed 
-  top-[19vh] 
   min-[300px]:top-[19vh] 
   min-[344px]:top-[14.7vh] 
   min-[360px]:top-[17.5vh] 
@@ -156,7 +155,8 @@ const displayedGroups = selectedPlatform
   min-[430px]:top-[14vh] 
   min-[768px]:top-[12.5vh] 
   min-[820px]:top-[11vh] 
-  min-[1024px]:top-[9.5vh] 
+  min-[1000px]:top-[19vh] 
+  min-[1100px]:top-[21.5vh] 
   left-0 
   right-0 
   p-1 

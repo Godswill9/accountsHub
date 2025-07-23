@@ -332,7 +332,7 @@ const getRate = async (from, to) => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
           </div>
         ) : (
-          <>
+          <> 
             <div className="mb-8">
               <WalletHeader
                 balance={balance}

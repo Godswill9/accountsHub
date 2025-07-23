@@ -34,7 +34,7 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          <div
+          {/* <div
             className="bg-white/20 p-3 rounded-lg flex items-center justify-between hover:bg-white/30 cursor-pointer transition-colors"
             onClick={onAddFundsClick}
           >
@@ -42,8 +42,8 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({
               <ArrowUpRight className="h-5 w-5 mr-2" />
               <span>Add Funds</span>
             </div>
-          </div>
-          <div
+          </div> */}
+          {/* <div
             className="bg-white/20 p-3 rounded-lg flex items-center justify-between hover:bg-white/30 cursor-pointer transition-colors"
             onClick={onWithdrawClick}
           >
@@ -51,7 +51,7 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({
               <ArrowDownLeft className="h-5 w-5 mr-2" />
               <span>Withdraw</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>
