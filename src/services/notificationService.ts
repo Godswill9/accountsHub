@@ -11,7 +11,7 @@ export const NOTIFICATION_ENDPOINTS = {
 
 export const createNotification = async (data: any) => {
   try {
-    const response = await axios.post(NOTIFICATION_ENDPOINTS.CREATE, data);
+    const response = await axios.post(NOTIFICATION_ENDPOINTS.CREATE, data, {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -21,7 +21,7 @@ export const createNotification = async (data: any) => {
 
 export const getNotifications = async (userId: string) => {
   try {
-    const response = await axios.get(NOTIFICATION_ENDPOINTS.LIST(userId));
+    const response = await axios.get(NOTIFICATION_ENDPOINTS.LIST(userId),{withCredentials:true});
     return response.data;
   } catch (error) {
     console.error("Error fetching notifications:", error);
@@ -31,7 +31,7 @@ export const getNotifications = async (userId: string) => {
 
 export const deleteNotification = async (notificationId: string) => {
   try {
-    const response = await axios.delete(NOTIFICATION_ENDPOINTS.DELETE(notificationId));
+    const response = await axios.delete(NOTIFICATION_ENDPOINTS.DELETE(notificationId), {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error("Error deleting notification:", error);
@@ -41,7 +41,7 @@ export const deleteNotification = async (notificationId: string) => {
 
 export const deleteAllNotifications = async (userId: string) => {
   try {
-    const response = await axios.delete(NOTIFICATION_ENDPOINTS.DELETE_ALL(userId));
+    const response = await axios.delete(NOTIFICATION_ENDPOINTS.DELETE_ALL(userId), {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error("Error deleting all notifications:", error);
@@ -51,7 +51,7 @@ export const deleteAllNotifications = async (userId: string) => {
 
 export const markNotificationAsSeen = async (notificationId: string) => {
   try {
-    const response = await axios.put(NOTIFICATION_ENDPOINTS.MARK_AS_SEEN(notificationId));
+    const response = await axios.put(NOTIFICATION_ENDPOINTS.MARK_AS_SEEN(notificationId), {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error("Error marking notification as seen:", error);

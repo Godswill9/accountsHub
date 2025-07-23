@@ -116,6 +116,7 @@ const fetchChatMessages = async (orderId) => {
     const response = await fetch(`https://aitool.asoroautomotive.com/api/${orderId}`, {
     // const response = await fetch(`http://localhost:8086/api/${orderId}`, {
       method: "GET",
+       credentials:"include"
     });
 
     if (!response.ok) {
@@ -221,6 +222,7 @@ const handleSendMessage = async (content: string, type: string = "text") => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(chatData),
+       credentials:"include"
     });
 
     const data = await response.json();
@@ -279,6 +281,7 @@ const handleSendMessage = async (content: string, type: string = "text") => {
     // const response = await fetch("http://localhost:8086/api/sendMessage", {
       method: "POST",
       body: formData,
+       credentials:"include"
     });
 
     const data = await response.json();

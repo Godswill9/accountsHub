@@ -242,6 +242,7 @@ const showOrderThankYouPopup = () => {
         body: JSON.stringify({
           user_id: userId,
         }),
+         credentials:"include"
       }
     );
 
@@ -256,6 +257,7 @@ const showOrderThankYouPopup = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(orderData),
+           credentials:"include"
         }
       );
 
@@ -281,7 +283,7 @@ const showOrderThankYouPopup = () => {
       // Coupon validation
       try {
         const response = await fetch(
-          `https://aitool.asoroautomotive.com/api/coupon/${couponValue}`
+          `https://aitool.asoroautomotive.com/api/coupon/${couponValue}`,{credentials:"include"}
         );
         const data = await response.json();
 
@@ -307,6 +309,7 @@ const showOrderThankYouPopup = () => {
               toUserId: "678f3fa1-8b88-45ef-b945-97b06d0d8f1f",
               amount: Number(discountedPrice),
             }),
+             credentials:"include"
           }
         );
         const data2 = await response2.json();
@@ -356,6 +359,7 @@ const showOrderThankYouPopup = () => {
               toUserId: "678f3fa1-8b88-45ef-b945-97b06d0d8f1f",
               amount: totalPriceValue,
             }),
+             credentials:"include"
           }
         );
 
@@ -404,6 +408,7 @@ const showOrderThankYouPopup = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(paymentData),
+           credentials:"include"
         }
       );
 
@@ -426,6 +431,7 @@ const showOrderThankYouPopup = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(conversationData),
+           credentials:"include"
         }
       );
 
@@ -450,6 +456,7 @@ const showOrderThankYouPopup = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(chatData),
+           credentials:"include"
         }
       );
 
@@ -578,9 +585,18 @@ const showOrderThankYouPopup = () => {
        <div className="p-5 rounded-xl bg-gray-50 border border-gray-200 shadow-sm">
   <div className="flex items-center justify-between mb-3">
     <h2 className="text-lg font-bold text-gray-800">Data Format</h2>
-    <span className="inline-block text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-medium border border-blue-200">
-      {product.data_format || "Email & Password"}
-    </span>
+  </div>
+  <div className="flex flex-wrap gap-2">
+    {(product.data_format || "Email & Password")
+      .split("|")
+      .map((item, index) => (
+        <span
+          key={index}
+          className="inline-block text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-medium border border-blue-200"
+        >
+          {item.trim()}
+        </span>
+      ))}
   </div>
 </div>
 

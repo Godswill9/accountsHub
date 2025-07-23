@@ -52,15 +52,20 @@ const OrderList: React.FC<OrderListProps> = ({ orders, messagesCount }) => {
     }
   };
 
-  const updateOrderSeen = async (orderId: string) => {
+const updateOrderSeen = async (orderId: string) => {
   try {
-    const response = await axios.put(`https://aitool.asoroautomotive.com/api/user-order-seen/${orderId}`);
+    const response = await axios.put(
+      `https://aitool.asoroautomotive.com/api/user-order-seen/${orderId}`,
+      {}, // empty body
+      { withCredentials: true } // correct place for config
+    );
     console.log("Order marked as seen:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error marking order as seen:", error);
   }
 };
+
 
   return (
     <div className="rounded-md border">

@@ -63,6 +63,7 @@ useEffect(() => {
                     headers: {
                       "Content-Type": "application/json",
                     },
+                     credentials:"include"
                   });
 
                   // Update UI optimistically

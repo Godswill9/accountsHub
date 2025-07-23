@@ -42,7 +42,7 @@ const [accountSuspendedStatus,setAccountSuspendedStatus] = useState(false)
    const fetchMessagesFromId = async (orderId: string) => {
   try {
     const res = await axios.get(
-      `https://aitool.asoroautomotive.com/api/${orderId}`
+      `https://aitool.asoroautomotive.com/api/${orderId}`, {withCredentials:true}
     );
 
     const unseenFromSeller = res.data.filter(
@@ -70,7 +70,7 @@ const unreadConversationsCount = Object.values(messagesCount).filter(
    const fetchMessages= async(sellerId: string)=>{
        try {
         const res = await axios.get(
-          `https://aitool.asoroautomotive.com/api/conversations/${sellerId}`
+          `https://aitool.asoroautomotive.com/api/conversations/${sellerId}`, {withCredentials:true}
         );
        
         return res.data.conversations

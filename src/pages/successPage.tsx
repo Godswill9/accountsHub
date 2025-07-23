@@ -221,6 +221,7 @@ const txRef = query.get("tx_ref");
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(paymentData),
+           credentials:"include"
         }
       );
 
@@ -248,6 +249,7 @@ const txRef = query.get("tx_ref");
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(orderData),
+           credentials:"include"
         }
       );
 

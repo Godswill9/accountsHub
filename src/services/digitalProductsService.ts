@@ -36,7 +36,7 @@ export const fetchFeaturedProducts = async (): Promise<Product[]> => {
 
 export const fetchAllProducts = async (): Promise<Product[]> => {
   try {
-    const response = await axios.get(DIGITAL_PRODUCTS_ENDPOINTS.ALL);
+    const response = await axios.get(DIGITAL_PRODUCTS_ENDPOINTS.ALL, {withCredentials:true});
     const allProducts = response.data || [];
     return allProducts.filter((product: Product) => product.status === "approved");
   } catch (error) {
@@ -48,7 +48,7 @@ export const fetchAllProducts = async (): Promise<Product[]> => {
 
 export const fetchProductDetails = async (id: string): Promise<Product> => {
   try {
-    const response = await axios.get(DIGITAL_PRODUCTS_ENDPOINTS.DETAILS(id));
+    const response = await axios.get(DIGITAL_PRODUCTS_ENDPOINTS.DETAILS(id),{withCredentials:true});
     // console.log(response.data)
     return response.data.product;
   } catch (error) {

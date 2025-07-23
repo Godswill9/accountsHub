@@ -82,7 +82,7 @@ setOrders(sortedOrders);
     const fetchMessages= async(sellerId: string)=>{
        try {
         const res = await axios.get(
-          `https://aitool.asoroautomotive.com/api/conversations/${sellerId}`
+          `https://aitool.asoroautomotive.com/api/conversations/${sellerId}`, {withCredentials:true}
         );
        
         return res.data.conversations
@@ -96,7 +96,7 @@ setOrders(sortedOrders);
   const fetchMessagesFromId = async (orderId: string) => {
   try {
     const res = await axios.get(
-      `https://aitool.asoroautomotive.com/api/${orderId}`
+      `https://aitool.asoroautomotive.com/api/${orderId}`, {withCredentials:true}
     );
 
     const unseenFromSeller = res.data.filter(

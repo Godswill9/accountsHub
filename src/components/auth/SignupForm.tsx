@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Lock, User, Globe, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/authService";
+import countries from '@/components/auth/phone-code-en.json'; // adjust path if needed
 
 interface AuthResponse {
   id: string;
@@ -29,6 +30,10 @@ const SignupForm = () => {
   const navigate = useNavigate();
   const { signup, verifyCode } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+const [dialCode, setDialCode] = useState("");
+const [emoji, setEmoji]=useState("")
+
+
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -47,6 +52,13 @@ const SignupForm = () => {
     }
   };
 
+  const handleCountryChange = (e) => {
+  const selected = countries.find(c => c.name === e.target.value);
+  setCountry(selected.name);
+  setDialCode(selected.phoneCode);
+  setEmoji(selected.flagEmoji)
+};
+
   useEffect(() => {
     checkAuthStatus();
   }, []);
@@ -64,6 +76,17 @@ const SignupForm = () => {
         return;
       }
 
+         // ✅ Check for at least two words in the name
+    const nameWords = name.trim().split(/\s+/);
+    if (nameWords.length < 2) {
+      toast({
+        title: "Invalid Name",
+        description: "Please enter at least a first and last name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
       if (password !== confirmPassword) {
         toast({
           title: "Error",
@@ -74,8 +97,8 @@ const SignupForm = () => {
       }
 
  try {
-  const data = await signup(name, email, password, "code", country, phoneNumber);
-
+  const fullPhoneNumber = `${dialCode} ${phoneNumber}`;
+  const data = await signup(name, email, password, "code", country, fullPhoneNumber); 
   if (data.message === "User already exists but not verified. Verify your email") {
     toast({
       title: "Notice",
@@ -186,39 +209,46 @@ try {
     />
   </div>
 
-  {/* Country input */}
-  <div className="relative">
-    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-      {/* Consider using a different icon like a Globe */}
-      <Globe className="h-4 w-4 text-gray-500" />
-    </div>
-    <Input
-      id="country"
-      type="text"
-      placeholder="Country"
-      value={country}
-      onChange={(e) => setCountry(e.target.value)}
-      className="pl-10"
-      required
-    />
+{/* Country Dropdown */}
+<div className="relative">
+  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+    <Globe className="h-4 w-4 text-gray-500" />
   </div>
+  <select
+    id="country"
+    value={country}
+    onChange={handleCountryChange}
+    className="pl-10 pr-4 py-2 border rounded w-full"
+    required
+  >
+    <option value="">Select Country</option>
+    {countries.map((c) => (
+      <option key={c.code} value={c.name}>
+        {c.name}
+      </option>
+    ))}
+  </select>
+</div>
 
-  {/* Phone number input */}
-  <div className="relative">
-    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-      {/* Consider using a Phone icon */}
-      <Phone className="h-4 w-4 text-gray-500" />
-    </div>
-    <Input
-      id="phoneNumber"
-      type="tel"
-      placeholder="Phone Number"
-      value={phoneNumber}
-      onChange={(e) => setPhoneNumber(e.target.value)}
-      className="pl-10"
-      required
-    />
+{/* Phone Number Input */}
+<div className="relative mt-4">
+  <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+    <Phone className="h-4 w-4 text-gray-500" />
   </div>
+  <div className="absolute inset-y-0 text-[13px] left-8 flex items-center text-gray-700">
+    {dialCode}
+  </div>
+  <Input
+    id="phoneNumber"
+    type="number"
+    placeholder="Phone Number"
+    value={phoneNumber}
+    onChange={(e) => setPhoneNumber(e.target.value)}
+    className="pl-20 no-spinner"
+    required
+  />
+</div>
+
 </div>
 
           <div className="space-y-2">

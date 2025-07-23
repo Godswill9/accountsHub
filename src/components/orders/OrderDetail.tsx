@@ -23,6 +23,7 @@ interface OrderDetailProps {
     item_name: string;
     item_id: string;
     amount: string;
+    seller_id?:string
   };
 }
 
@@ -129,24 +130,43 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
           </div>
         </div>
       </CardContent>
-<CardFooter className="flex flex-col lg:flex-row justify-between items-center gap-4 w-full">
-  <Button variant="outline" onClick={() => navigate('/orders')} className="w-full lg:w-auto">
+<CardFooter className="flex flex-col lg:flex-row justify-between items-center gap-6 w-full bg-muted p-4 rounded-xl">
+  {/* Back Button */}
+  <Button
+    variant="outline"
+    onClick={() => navigate('/orders')}
+    className="w-full lg:w-auto"
+  >
     <ArrowLeft className="h-4 w-4 mr-2" />
     Back to Orders
   </Button>
 
-  <div className="flex flex-col items-center text-center lg:text-left lg:items-start gap-2 w-full lg:w-auto">
+  {/* Seller Help Section */}
+  <div className="flex flex-col items-center text-center lg:items-start lg:text-left w-full lg:w-auto gap-3">
     <p className="text-sm text-muted-foreground">
-      Have a complaint? Reach out to the seller directly:
+      Need help with this order? Contact the seller:
     </p>
-    <Button variant="outline" onClick={() =>{
-      navigate(`/conversation/${order.order_id}`)
-    }} className="w-full lg:w-auto">
+
+    {/* Message Seller */}
+    <Button
+      variant="outline"
+      onClick={() => navigate(`/conversation/${order.order_id}`)}
+      className="w-full lg:w-auto"
+    >
       <MessageCircle className="h-4 w-4 mr-2" />
       Message Seller
     </Button>
+
+    {/* View Seller Profile */}
+    <Link
+      to={`/about-seller/${order.seller_id}`}
+      className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition w-full lg:w-auto"
+    >
+      View Seller
+    </Link>
   </div>
 </CardFooter>
+
 
     </Card>
   );

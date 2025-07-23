@@ -22,7 +22,7 @@ export const createOrder = async (orderData: any) => {
 
 export const getOrder = async (orderId: string) => {
   try {
-    const response = await axios.get(ORDER_ENDPOINTS.GET(orderId));
+    const response = await axios.get(ORDER_ENDPOINTS.GET(orderId), {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error(`Error fetching order ${orderId}:`, error);
@@ -32,7 +32,7 @@ export const getOrder = async (orderId: string) => {
 
 export const getOrders = async (userId: string) => {
   try {
-    const response = await axios.get(ORDER_ENDPOINTS.LIST(userId));
+    const response = await axios.get(ORDER_ENDPOINTS.LIST(userId), {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -42,7 +42,7 @@ export const getOrders = async (userId: string) => {
 
 export const updateOrder = async (orderData: any) => {
   try {
-    const response = await axios.put(ORDER_ENDPOINTS.UPDATE, orderData);
+    const response = await axios.put(ORDER_ENDPOINTS.UPDATE, orderData, {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error('Error updating order:', error);
@@ -52,7 +52,7 @@ export const updateOrder = async (orderData: any) => {
 
 export const deleteOrder = async (orderId: string) => {
   try {
-    const response = await axios.delete(ORDER_ENDPOINTS.DELETE(orderId));
+    const response = await axios.delete(ORDER_ENDPOINTS.DELETE(orderId), {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error(`Error deleting order ${orderId}:`, error);

@@ -28,7 +28,7 @@ const currencies = {
 
 const paymentLogos = {
   paystack: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Paystack_Logo.png",
-  flutterwave: "public/flutterwave.png",
+  flutterwave: "public/download.png",
   paypal: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
 };
 
@@ -51,6 +51,10 @@ const WalletPage: React.FC = () => {
 
 
 
+useEffect(() => {
+  const onlyMethod = Object.keys(currencies)[0];
+  setPaymentMethod(onlyMethod);
+}, []);
 
 
   const [usdEquivalent, setUsdEquivalent] = useState(null);
@@ -238,6 +242,7 @@ const getRate = async (from, to) => {
             redirect_url: "https://accountshub.onrender.com/verify-payment",
             // payment_method_types: [paymentMethod],
           }),
+          credentials:"include"
         }
       );
 
@@ -281,6 +286,7 @@ const getRate = async (from, to) => {
             order_id: `id for ${userId}`,
             order_description: "Wallet funding",
           }),
+          credentials:"include"
         }
       );
 
@@ -347,14 +353,14 @@ const getRate = async (from, to) => {
             </div>
 
             <Tabs defaultValue="transactions" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
                 <TabsTrigger value="transactions">Transactions</TabsTrigger>
                 <TabsTrigger value="add-funds" id="add-funds-tab">
                   Add Funds
                 </TabsTrigger>
-                <TabsTrigger value="withdraw" id="withdraw-tab">
+                {/* <TabsTrigger value="withdraw" id="withdraw-tab">
                   Withdraw
-                </TabsTrigger>
+                </TabsTrigger> */}
               </TabsList>
 
               <TabsContent value="transactions" className="mt-0">
@@ -393,31 +399,50 @@ const getRate = async (from, to) => {
                     <label className="block text-sm font-semibold mb-1">
                       Payment Method
                     </label>
-                    <div className="flex mt-2">
-                      <label className="mr-4 flex items-center">
-                        <input
-                          type="radio"
-                          name="payment-method"
-                          value="crypto"
-                          checked={paymentType === "crypto"}
-                          onChange={() => setPaymentType("crypto")}
-                        />
-                        <span className="ml-2">Cryptocurrency</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="payment-method"
-                          value="normal"
-                          checked={paymentType === "normal"}
-                          onChange={() => setPaymentType("normal")}
-                        />
-                        <span className="ml-2">Normal Currencies</span>
-                      </label>
-                    </div>
+                   <div className="flex mt-4 gap-4">
+  <label
+    className={`flex items-center cursor-pointer px-4 py-2 rounded-md border text-sm transition-all
+      ${
+        paymentType === "crypto"
+          ? "bg-yellow-100 border-yellow-500 text-yellow-800 font-medium"
+          : "bg-white border-gray-300 text-gray-700 hover:border-yellow-400"
+      }`}
+  >
+    <input
+      type="radio"
+      name="payment-method"
+      value="crypto"
+      checked={paymentType === "crypto"}
+      onChange={() => setPaymentType("crypto")}
+      className="hidden"
+    />
+    Cryptocurrency
+  </label>
+
+  <label
+    className={`flex items-center cursor-pointer px-4 py-2 rounded-md border text-sm transition-all
+      ${
+        paymentType === "normal"
+          ? "bg-blue-100 border-blue-500 text-blue-800 font-medium"
+          : "bg-white border-gray-300 text-gray-700 hover:border-blue-400"
+      }`}
+  >
+    <input
+      type="radio"
+      name="payment-method"
+      value="normal"
+      checked={paymentType === "normal"}
+      onChange={() => setPaymentType("normal")}
+      className="hidden"
+    />
+    Normal Currencies
+  </label>
+</div>
+
                   </div>
 
-                  {paymentType === "normal" && (
+   {/* initial one...still working */}
+                  {/* {paymentType === "normal" && (
                     <div className="max-w-xl mx-auto space-y-6">
                       <form
                         onSubmit={handleAddFunds}
@@ -515,38 +540,221 @@ const getRate = async (from, to) => {
 </button>
                       </form>
                     </div>
-                  )}
+                  )} */}
 
-                  {paymentType === "crypto" && (
-                    <div className="max-w-xl mx-auto space-y-6">
-                      <form
-                        onSubmit={handleCryptoPayment}
-                        className="bg-white p-6 rounded-lg shadow-md space-y-6"
-                      >
-                        <div>
-                          <label className="block text-sm font-semibold mb-1">
-                            Amount
-                          </label>
-                          <input
-                            type="number"
-                            min="1"
-                            step="any"
-                            className="w-full p-2 border rounded"
-                            placeholder="Enter amount in USD"
-                            value={cryptoPrice}
-                            onChange={(e) => setcryptoPrice(e.target.value)}
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={funding}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition"
-                        >
-                          {funding ? "Processing..." : "Proceed to Payment"}
-                        </button>
-                      </form>
-                    </div>
-                  )}
+               {/* {paymentType === "normal" && (
+  <div className="max-w-xl mx-auto space-y-6">
+    <form
+      onSubmit={handleAddFunds}
+      className="bg-white p-6 rounded-lg shadow-md space-y-6"
+    >
+      <div>
+        <label className="block text-sm font-semibold mb-1">
+          Payment Method
+        </label>
+        <div className="flex items-center space-x-3 p-3 border rounded bg-gray-50">
+          <img
+            src={paymentLogos[paymentMethod]}
+            alt={paymentMethod}
+            className="w-6 h-6"
+          />
+          <span className="font-medium capitalize">{paymentMethod}</span>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold mb-1">Currency</label>
+        <select
+          className="w-full p-3 border rounded"
+          value={currency}
+          onChange={(e) => {
+            setCurrency(e.target.value);
+            setAmount("");
+            setUsdEquivalent(null);
+            setError("");
+          }}
+        >
+          <option value="">Select a currency</option>
+          {currencies[paymentMethod].map((cur) => (
+            <option key={cur} value={cur}>
+              {cur.toUpperCase()}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {currency && (
+        <div>
+          <label className="block text-sm font-semibold mb-1">Amount</label>
+          <input
+            type="number"
+            min="1"
+            step="any"
+            className="w-full p-3 border rounded"
+            placeholder="Enter amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          {usdEquivalent && (
+            <p className="text-sm text-gray-600 mt-1">
+              ≈ ${usdEquivalent} USD
+            </p>
+          )}
+          {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={
+          funding ||
+          !amount ||
+          !usdEquivalent ||
+          parseFloat(usdEquivalent) < 10
+        }
+        className={`w-full font-semibold py-2 rounded transition ${
+          funding || !amount || !usdEquivalent || parseFloat(usdEquivalent) < 10
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 text-white"
+        }`}
+      >
+        {funding ? "Processing..." : "Proceed to Payment"}
+      </button>
+    </form>
+  </div>
+)}  */}
+
+{paymentType === "normal" && (
+  <div className="max-w-xl mx-auto space-y-6">
+    <form
+      onSubmit={handleAddFunds}
+      className="bg-white p-6 rounded-2xl shadow-lg border space-y-6"
+    >
+      {/* 💳 Payment Method Display */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Payment Method
+        </label>
+        <div className="flex items-center gap-3 p-4 rounded-xl border bg-gray-100 shadow-inner">
+          <img
+            src={paymentLogos[paymentMethod]}
+            alt={paymentMethod}
+            className="w-8 h-8 object-contain"
+          />
+          <span className="text-gray-800 font-semibold capitalize text-base">
+            {paymentMethod}
+          </span>
+        </div>
+      </div>
+
+      {/* 🌍 Currency Selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Currency
+        </label>
+        <select
+          className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={currency}
+          onChange={(e) => {
+            setCurrency(e.target.value);
+            setAmount("");
+            setUsdEquivalent(null);
+            setError("");
+          }}
+        >
+          <option value="">Select a currency</option>
+          {currencies[paymentMethod].map((cur) => (
+            <option key={cur} value={cur}>
+              {cur.toUpperCase()}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 💰 Amount Input */}
+      {currency && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Amount
+          </label>
+          <input
+            type="number"
+            min="1"
+            step="any"
+            className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          {usdEquivalent && (
+            <p className="text-sm text-green-700 mt-1">
+              ≈ ${usdEquivalent} USD
+            </p>
+          )}
+          {error && (
+            <p className="text-sm text-red-600 mt-1 font-medium">{error}</p>
+          )}
+        </div>
+      )}
+
+      {/* ✅ Submit Button */}
+      <button
+        type="submit"
+        disabled={
+          funding ||
+          !amount ||
+          !usdEquivalent ||
+          parseFloat(usdEquivalent) < 10
+        }
+        className={`w-full font-semibold py-3 rounded-xl transition text-center text-white text-sm ${
+          funding || !amount || !usdEquivalent || parseFloat(usdEquivalent) < 10
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+        }`}
+      >
+        {funding ? "Processing..." : "Proceed to Payment"}
+      </button>
+    </form>
+  </div>
+)}
+
+
+                 {paymentType === "crypto" && (
+  <div className="max-w-md mx-auto">
+    <form
+      onSubmit={handleCryptoPayment}
+      className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 p-6 rounded-2xl shadow-lg space-y-6"
+    >
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Amount (USD)
+        </label>
+        <input
+          type="number"
+          min="1"
+          step="any"
+          className="w-full rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-3 text-sm"
+          placeholder="e.g. 50.00"
+          value={cryptoPrice}
+          onChange={(e) => setcryptoPrice(e.target.value)}
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={funding}
+        className={`w-full py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
+          funding
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+        }`}
+      >
+        {funding ? "Processing..." : "Proceed to Payment"}
+      </button>
+    </form>
+  </div>
+)}
+
                 </div>
               </TabsContent>
 

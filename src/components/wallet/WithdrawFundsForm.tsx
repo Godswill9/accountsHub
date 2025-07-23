@@ -16,7 +16,7 @@ import axios from 'axios';
 const WithdrawFundsForm: React.FC<{ currentBalance: number; userId: string }> = ({ currentBalance, userId }) => {
   const [loading, setLoading] = useState(false);
 
-  const [method, setMethod] = useState("flutterwave");
+  const [method, setMethod] = useState("payoneer");
     const [details, setDetails] = useState<any>({});
     const [loadingField, setLoadingField] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,18 +39,56 @@ const schema = z.object({
   payoneerEmail: z.string().optional(),
   coin: z.string().optional(),
   wallet: z.string().optional(),
+  network: z.string().optional(),
 });
+
+const coinOptions = [
+  {
+    coin: "USDT",
+    networks: ["TRC20", "ERC20", "BEP20", "Polygon"],
+  },
+  {
+    coin: "BTC",
+    networks: ["Bitcoin"],
+  },
+  {
+    coin: "ETH",
+    networks: ["Ethereum", "Arbitrum", "Optimism", "Polygon"],
+  },
+  {
+    coin: "BNB",
+    networks: ["BEP20", "BEP2"],
+  },
+  {
+    coin: "USDC",
+    networks: ["ERC20", "TRC20", "BEP20", "Solana"],
+  },
+  {
+    coin: "DAI",
+    networks: ["Ethereum", "Polygon", "BSC"],
+  },
+  {
+    coin: "SOL",
+    networks: ["Solana"],
+  },
+  {
+    coin: "MATIC",
+    networks: ["Polygon"],
+  },
+];
+
 
 const form = useForm<z.infer<typeof schema>>({
   defaultValues: {
     amount: 0,
-    withdrawalMethod: "bank",
+    withdrawalMethod: "payoneer",
     bankCode: "",
     accountNumber: "",
     paypalEmail: "",
     payoneerEmail: "",
     coin: "",
     wallet: "",
+    network:""
   },
   mode: "onBlur",
 });
@@ -67,7 +105,7 @@ const form = useForm<z.infer<typeof schema>>({
     const res = await axios.post("https://aitool.asoroautomotive.com/api/flutterwave/checkBankDet", {
       bank_code: bankCode,
       account_number: accountNumber,
-    });
+    }, {withCredentials:true});
 
     console.log(res.data)
 
@@ -111,14 +149,23 @@ const form = useForm<z.infer<typeof schema>>({
           method,
           details,
           amount: numericAmount,
-        }
+        },
+          {withCredentials:true}
       );
 
       if (response.data.status === "success") {
         setResult("success");
+         toast({
+            title: "Withdrawal request submitted successfully.",
+            variant: "default",
+          });
         // onComplete("success", "Withdrawal request submitted successfully");
       } else {
         setResult("fail");
+          toast({
+        title: "Failed to submit withdrawal request.",
+        variant: "destructive",
+      });
         // onComplete("fail", "Failed to submit withdrawal request");
       }
     } catch (error) {
@@ -152,14 +199,23 @@ const form = useForm<z.infer<typeof schema>>({
           method,
           details,
           amount: numericAmount
-        }
+        },
+        {withCredentials:true}
       );
 
-     if (response.data.status === "success") {
+      if (response.data.status === "success") {
         setResult("success");
+         toast({
+            title: "Withdrawal request submitted successfully.",
+            variant: "default",
+          });
         // onComplete("success", "Withdrawal request submitted successfully");
       } else {
         setResult("fail");
+          toast({
+        title: "Failed to submit withdrawal request.",
+        variant: "destructive",
+      });
         // onComplete("fail", "Failed to submit withdrawal request");
       }
     } catch (error) {
@@ -192,14 +248,23 @@ const form = useForm<z.infer<typeof schema>>({
           method,
           details,
           amount: numericAmount
-        }
+        },
+          {withCredentials:true}
       );
 
-       if (response.data.status === "success") {
+      if (response.data.status === "success") {
         setResult("success");
+         toast({
+            title: "Withdrawal request submitted successfully.",
+            variant: "default",
+          });
         // onComplete("success", "Withdrawal request submitted successfully");
       } else {
         setResult("fail");
+          toast({
+        title: "Failed to submit withdrawal request.",
+        variant: "destructive",
+      });
         // onComplete("fail", "Failed to submit withdrawal request");
       }
     } catch (error) {
@@ -214,6 +279,7 @@ const form = useForm<z.infer<typeof schema>>({
 const details = {
     coin: form.getValues("coin"),
     wallet: form.getValues("wallet"),
+    network:form.getValues("network")
   };
     if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
       // onComplete("fail", "Invalid amount");
@@ -233,14 +299,22 @@ const details = {
           method,
           details,
           amount: numericAmount
-        }
+        },
+          {withCredentials:true}
       );
-
-    if (response.data.status === "success") {
+  if (response.data.status === "success") {
         setResult("success");
+         toast({
+            title: "Withdrawal request submitted successfully.",
+            variant: "default",
+          });
         // onComplete("success", "Withdrawal request submitted successfully");
       } else {
         setResult("fail");
+          toast({
+        title: "Failed to submit withdrawal request.",
+        variant: "destructive",
+      });
         // onComplete("fail", "Failed to submit withdrawal request");
       }
     } catch (error) {
@@ -292,17 +366,6 @@ const onSubmit = async () => {
   }else if (method === "paypal") {
     await handlePaypalWithdraw();
   }
-    if (result === "success") {
-      toast({
-        title: "Withdrawal request submitted successfully.",
-        variant: "default",
-      });
-    } else {
-      toast({
-        title: "Failed to submit withdrawal request.",
-        variant: "destructive",
-      });
-    }
   } catch (err) {
     console.error(err);
     toast({
@@ -447,8 +510,8 @@ const onSubmit = async () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="bank">Bank Transfer (Nigerians Only)</SelectItem>
-                        <SelectItem value="paypal">PayPal</SelectItem>
+                        {/* <SelectItem value="bank">Bank Transfer (Nigerians Only)</SelectItem> */}
+                        {/* <SelectItem value="paypal">PayPal</SelectItem> */}
                         <SelectItem value="payoneer">Payoneer</SelectItem>
                         <SelectItem value="crypto">Cryptocurrency</SelectItem>
                       </SelectContent>
@@ -565,6 +628,7 @@ const onSubmit = async () => {
               {/* Crypto */}
 {withdrawalMethod === "crypto" && (
   <>
+    {/* Coin Dropdown */}
     <FormField
       control={form.control}
       name="coin"
@@ -572,12 +636,60 @@ const onSubmit = async () => {
         <FormItem>
           <FormLabel>Coin</FormLabel>
           <FormControl>
-            <Input {...field} placeholder="e.g. USDT, BTC, ETH" />
+            <select
+              {...field}
+              className="border rounded p-2 w-full"
+              onChange={(e) => {
+                field.onChange(e);
+                form.setValue("network", ""); // reset network on coin change
+              }}
+            >
+              <option value="">Select Coin</option>
+              {coinOptions.map((option) => (
+                <option key={option.coin} value={option.coin}>
+                  {option.coin}
+                </option>
+              ))}
+            </select>
           </FormControl>
           <FormMessage />
         </FormItem>
       )}
     />
+
+    {/* Network Dropdown (based on selected coin) */}
+    <FormField
+      control={form.control}
+      name="network"
+      render={({ field }) => {
+        const selectedCoin = form.watch("coin");
+        const availableNetworks =
+          coinOptions.find((c) => c.coin === selectedCoin)?.networks || [];
+
+        return (
+          <FormItem>
+            <FormLabel>Network</FormLabel>
+            <FormControl>
+              <select
+                {...field}
+                className="border rounded p-2 w-full"
+                disabled={!selectedCoin}
+              >
+                <option value="">Select Network</option>
+                {availableNetworks.map((network) => (
+                  <option key={network} value={network}>
+                    {network}
+                  </option>
+                ))}
+              </select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        );
+      }}
+    />
+
+    {/* Wallet Address Input */}
     <FormField
       control={form.control}
       name="wallet"
@@ -593,6 +705,7 @@ const onSubmit = async () => {
     />
   </>
 )}
+
 
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (

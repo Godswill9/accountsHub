@@ -37,7 +37,7 @@ export interface WalletTransferRequest {
 
 export const addFunds = async (data: WalletFundsRequest): Promise<WalletResponse> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/wallet/add-funds`, data);
+    const response = await axios.post(`${API_BASE_URL}/wallet/add-funds`, data, {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error('Error adding funds:', error);
@@ -47,7 +47,7 @@ export const addFunds = async (data: WalletFundsRequest): Promise<WalletResponse
 
 export const withdrawFunds = async (data: WalletFundsRequest): Promise<WalletResponse> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/wallet/withdraw-funds`, data);
+    const response = await axios.post(`${API_BASE_URL}/wallet/withdraw-funds`, data, {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error('Error withdrawing funds:', error);
@@ -57,7 +57,7 @@ export const withdrawFunds = async (data: WalletFundsRequest): Promise<WalletRes
 
 export const transferFunds = async (data: WalletTransferRequest): Promise<WalletResponse> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/wallet/transfer-funds`, data);
+    const response = await axios.post(`${API_BASE_URL}/wallet/transfer-funds`, data, {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error('Error transferring funds:', error);
