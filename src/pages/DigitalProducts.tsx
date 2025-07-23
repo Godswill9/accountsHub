@@ -145,8 +145,26 @@ const displayedGroups = selectedPlatform
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
-<div className="fixed top-[22vh] min-[1000px]:top-[21vh] left-0 p-1 right-0 m-2 z-50 bg-white">
-      {/* Header with toggle */}
+<div className="
+  fixed 
+  top-[19vh] 
+  min-[300px]:top-[19vh] 
+  min-[344px]:top-[14.7vh] 
+  min-[360px]:top-[17.5vh] 
+  min-[390px]:top-[15vh] 
+  min-[400px]:top-[14.5vh] 
+  min-[430px]:top-[14vh] 
+  min-[768px]:top-[12.5vh] 
+  min-[820px]:top-[11vh] 
+  min-[1024px]:top-[9.5vh] 
+  left-0 
+  right-0 
+  p-1 
+  m-2 
+  z-50 
+  bg-white
+">
+     {/* Header with toggle */}
      <div className="flex items-center left mb-4 border-b pb-2">
   <h2 className="text-xl font-semibold text-gray-800 tracking-tight">
    Filter by
