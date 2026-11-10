@@ -41,6 +41,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchInterval: 30000, // product lists stay current without a refresh; paused in hidden tabs
       retry: 1,
     },
   },

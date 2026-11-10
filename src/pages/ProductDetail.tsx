@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProductDetails } from "@/services/digitalProductsService";
 import Header from "@/components/Header";
+import { ProductReviews } from "@/components/Ratings";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -62,6 +68,9 @@ const ProductDetail = () => {
     const [isBanned, setIsBanned] = useState(false);
     const [showThankYou, setShowThankYou] = useState(false);
     const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+  // Purchase problems: a dialog with an optional next step (e.g. "Add funds") instead of a browser alert.
+  const [notice, setNotice] = useState<{ title: string; message: string; action?: { label: string; to: string } } | null>(null);
 
 const showOrderThankYouPopup = () => {
   setShowThankYou(true);
@@ -97,7 +106,7 @@ const showOrderThankYouPopup = () => {
     try {
       const imagePromises = arr.map(async (item) => {
         const response = await fetch(
-          `https://aitool.asoroautomotive.com/api/get-product-image/${item.id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/get-product-image/${item.id}`,
           {
             method: "GET",
             credentials: "include",
@@ -172,7 +181,7 @@ const showOrderThankYouPopup = () => {
 
   function downloadFiles(fileArray: []) {
     fetch(
-      `https://aitool.asoroautomotive.com/api/download-digital-products?ids=${fileArray.join(
+      `${import.meta.env.VITE_API_BASE_URL}/download-digital-products?ids=${fileArray.join(
         ","
       )}`,
       {
@@ -204,7 +213,7 @@ const showOrderThankYouPopup = () => {
   async function downloadfetchAcc(fileCount: Number) {
     try {
       const response = await fetch(
-        `https://aitool.asoroautomotive.com/api/digital-products-FS/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/digital-products-FS/${id}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -231,202 +240,49 @@ const showOrderThankYouPopup = () => {
     }
   }
 
-  const updateCouponCode = async (id: string, userId: string) => {
-    const response = await fetch(
-      `https://aitool.asoroautomotive.com/api/updateCouponUsed/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: userId,
-        }),
-         credentials:"include"
-      }
-    );
-
-    const data = await response.json();
-  };
-
-  const createOrder = async (orderData: AccountDetails) => {
-    try {
-      const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/create-order",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderData),
-           credentials:"include"
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        // console.log("order created successfuflly:", data);
-        await createConversation({order_id: data.order_id, buyer_id: orderData.buyer_id, seller_id: orderData.seller_id, product_id: orderData.item_id});
-      } else {
-        console.error("❌ Error saving payment:", data.message);
-      }
-    } catch (error) {
-      console.error("❌ Network error:", error.message);
-    }
-  };
-
+  // The server prices the order, applies the coupon and debits the wallet in one step.
   async function createPayment() {
-    if(!userId || userId ===" "){
-      alert("Login and fund wallet to Purchase")
+    if (!userId || userId === " ") {
+      setNotice({ title: "Log in to buy", message: "Log in and fund your wallet to buy this account.", action: { label: "Log in", to: "/login" } });
       return;
     }
-    setLoading(true)
-    if (couponValue.length === 15) {
-      // Coupon validation
-      try {
-        const response = await fetch(
-          `https://aitool.asoroautomotive.com/api/coupon/${couponValue}`,{credentials:"include"}
-        );
-        const data = await response.json();
-
-        // Handle invalid, used, or expired coupons
-        if (response.status === 404 || data.message) {
-          console.log(response);
-          // responseDiv.innerHTML = `<p>Error: ${data.message || "Invalid or expired coupon"}</p>`;
-          return; // Stop execution if the coupon is not valid
-        }
-        console.log(data);
-        let discountValue = Number(data.discount_value);
-        let discountedPrice =
-          totalPriceValue - (discountValue / 100) * totalPriceValue;
-
-        // Proceed with fund transfer
-        const response2 = await fetch(
-          "https://aitool.asoroautomotive.com/api/wallet/transfer-funds",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              fromUserId: userId,
-              toUserId: "678f3fa1-8b88-45ef-b945-97b06d0d8f1f",
-              amount: Number(discountedPrice),
-            }),
-             credentials:"include"
-          }
-        );
-        const data2 = await response2.json();
-        if (data2.message === "Funds transferred successfully") {
-          // alert("Payment received. View details in orders page");
-          // await downloadfetchAcc(inputValue);
-          await updateCouponCode(data.id, userId);
-          await savePayment({
-            payment_type: "order",
-            payment_status: "completed",
-            payment_gateway: "wallet",
-            amount: Number(discountedPrice),
-            transaction_type: "order",
-            user_id: userId,
-            ref: "ref",
-          });
-          await createOrder({
-            item_id: product.id,
-            item_name: product.platform_name + "/" + product.category,
-            quantity: inputValue,
-            buyer_id: userId,
-            seller_id: sellerId,
-            amount: Number(discountedPrice),
-            buyer_email: userEmail,
-            ref: "ref",
-          });
-        } else {
-          alert(data2.error);
-          console.log(data2);
-          setLoading(false)
-        }
-      } catch (error) {
-        alert(error.message)
-        console.log(error.message);
-         setLoading(false)
-      }
-    } else {
-      try {
-        // Proceed without a coupon
-        const response = await fetch(
-          "https://aitool.asoroautomotive.com/api/wallet/transfer-funds",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              fromUserId: userId,
-              toUserId: "678f3fa1-8b88-45ef-b945-97b06d0d8f1f",
-              amount: totalPriceValue,
-            }),
-             credentials:"include"
-          }
-        );
-
-        const data = await response.json();
-        if (data.message === "Funds transferred successfully") {
-          // alert("Payment received. View details in orders page");
-          // await downloadfetchAcc(inputValue);
-          savePayment({
-            payment_type: "order",
-            payment_status: "completed",
-            payment_gateway: "wallet",
-            amount: totalPriceValue,
-            transaction_type: "order",
-            user_id: userId,
-            ref: "ref",
-          });
-          await createOrder({
-            item_id: product.id,
-            item_name: product.platform_name + "/" + product.category,
-            quantity: inputValue,
-            buyer_id: userId,
-            seller_id: sellerId,
-            amount: totalPriceValue,
-            buyer_email: userEmail,
-            ref: "ref",
-          });
-        } else {
-          alert(data.error)
-          console.log(data);
-           setLoading(false)
-        }
-      } catch (error) {
-         setLoading(false)
-         alert(error.message)
-        console.log(error.message);
-      }
-    }
-  }
-
-  
-  async function savePayment(paymentData: PaymentDetails) {
+    setLoading(true);
     try {
-      const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/payments",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(paymentData),
-           credentials:"include"
-        }
-      );
-
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/purchase`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          product_id: product.id,
+          quantity: inputValue,
+          coupon: couponValue.trim() || undefined,
+        }),
+      });
       const data = await response.json();
-      if (data.message === "Payment saved successfully") {
-        console.log("✅ Payment saved successfully:", data);
-      } else {
-        console.error("❌ Error saving payment:", data.message);
+      if (!response.ok) {
+        setNotice(/insufficient/i.test(data.message || "")
+          ? { title: "Not enough balance", message: "Your wallet doesn't have enough for this order. Add funds, then come back and buy.", action: { label: "Add funds", to: "/wallet" } }
+          : { title: "Purchase failed", message: data.message || "Something went wrong. Please try again." });
+        setLoading(false);
+        return;
       }
+      await createConversation({
+        order_id: data.order_id,
+        buyer_id: userId,
+        seller_id: data.seller_id,
+        product_id: product.id,
+      });
     } catch (error) {
-      console.error("❌ Network error:", error.message);
+      setNotice({ title: "Purchase failed", message: error?.message || "Check your connection and try again." });
+      setLoading(false);
     }
   }
+
   async function createConversation(conversationData: ConversationDetails) {
     try {
       const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/conversations",
-        // "http://localhost:8086/api/conversations",
+        `${import.meta.env.VITE_API_BASE_URL}/conversations`,
+        // `${import.meta.env.VITE_API_BASE_URL}/conversations`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -450,8 +306,8 @@ const showOrderThankYouPopup = () => {
   async function sendMessage(chatData: ChatDetails) {
     try {
       const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/sendMessage",
-        // "http://localhost:8086/api/sendMessage",
+        `${import.meta.env.VITE_API_BASE_URL}/sendMessage`,
+        // `${import.meta.env.VITE_API_BASE_URL}/sendMessage`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -560,15 +416,37 @@ const showOrderThankYouPopup = () => {
               <div className="text-3xl font-semibold text-gray-800">
                 ${product.price}
               </div>
+{product.specs && (
+  <div className="rounded-xl border border-gray-200 overflow-hidden">
+    <h2 className="text-lg font-bold text-gray-800 bg-gray-50 px-4 py-2 border-b border-gray-200">Account details</h2>
+    <dl className="grid grid-cols-2 sm:grid-cols-3 text-sm">
+      {[
+        ["Platform", product.platform_name],
+        ["Followers", product.specs.followers],
+        ["Account age", product.specs.account_age],
+        ["Niche", product.specs.niche],
+        ["Country", product.specs.country],
+        ["Monetized", product.specs.monetized ? "Yes" : "No"],
+      ].map(([k, v]) => (
+        <div key={k} className="px-4 py-3 border-b border-r border-gray-100">
+          <dt className="text-gray-500">{k}</dt>
+          <dd className="font-semibold text-gray-900">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+)}
+{product.description?.replace(/<[^>]+>/g, "").trim() && (
 <div className="bg-gray-100 p-3 rounded-md">
   <h2 className="text-xl font-extrabold text-gray-900 bg-gray-300 p-2 rounded-md">
-    Description
+    {product.specs ? "Seller notes" : "Description"}
   </h2>
   <div
     className="mt-2 text-gray-700 prose max-w-none text-left"
     dangerouslySetInnerHTML={{ __html: product.description }}
   />
 </div>
+)}
 
 {product.important_notice?.trim() && (
   <div className="bg-red-100 p-3 rounded-md">
@@ -584,7 +462,7 @@ const showOrderThankYouPopup = () => {
 
        <div className="p-5 rounded-xl bg-gray-50 border border-gray-200 shadow-sm">
   <div className="flex items-center justify-between mb-3">
-    <h2 className="text-lg font-bold text-gray-800">Data Format</h2>
+    <h2 className="text-lg font-bold text-gray-800">What's included</h2>
   </div>
   <div className="flex flex-wrap gap-2">
     {(product.data_format || "Email & Password")
@@ -666,7 +544,7 @@ const showOrderThankYouPopup = () => {
                                 Number(product.price) * newValue
                               );
                             } else {
-                              alert("You can't exceed the total stock.");
+                              toast({ title: `Only ${product.stock_quantity} in stock`, description: "You can't buy more than the available quantity." });
                             }
                           }}
                           className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-full text-xl transition-all"
@@ -707,6 +585,7 @@ const showOrderThankYouPopup = () => {
             Product not found.
           </div>
         )}
+        {product && <ProductReviews productId={product.id} sellerId={sellerId || product.seller_id} />}
       </main>
 {showThankYou && (
   <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -714,7 +593,7 @@ const showOrderThankYouPopup = () => {
       className="relative bg-cover bg-center rounded-2xl shadow-xl max-w-sm w-full p-6 text-center text-white overflow-hidden"
       style={{
         backgroundImage:
-          "url('https://accountshub.onrender.com/lovable-uploads/b8bc2363-f8b3-49a4-bec6-1490e3aa106a-removebg-preview.png')",
+          "url('/logo.png')",
       }}
     >
       {/* Overlay */}
@@ -750,6 +629,21 @@ const showOrderThankYouPopup = () => {
 
 
       <Footer />
+
+      <AlertDialog open={!!notice} onOpenChange={(open) => !open && setNotice(null)}>
+        <AlertDialogContent className="w-[90%] max-w-md rounded-xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{notice?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{notice?.message}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{notice?.action ? "Not now" : "OK"}</AlertDialogCancel>
+            {notice?.action && (
+              <AlertDialogAction onClick={() => navigate(notice.action!.to)}>{notice.action.label}</AlertDialogAction>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

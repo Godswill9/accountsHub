@@ -125,7 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/user-login",
+        `${import.meta.env.VITE_API_BASE_URL}/user-login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

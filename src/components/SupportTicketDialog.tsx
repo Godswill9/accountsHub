@@ -100,7 +100,7 @@ const SupportTicketDialog = ({
       fetchTicketMessages();
 
       // Poll for new messages every 30 seconds
-      const interval = setInterval(fetchTicketMessages, 30000);
+      const interval = setInterval(() => { if (!document.hidden) fetchTicketMessages(); }, 4000);
       return () => clearInterval(interval);
     }
   }, [ticketId, isOpen]);

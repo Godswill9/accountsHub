@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { live } from "@/lib/live";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wallet, Clock, ArrowUpDown } from "lucide-react";
 import Header from "@/components/Header";
@@ -26,10 +27,13 @@ const currencies = {
   // paypal: ["USD", "EUR", "GBP", "AUD", "CAD", "JPY"] // Major currencies supported by PayPal
 };
 
+// Must match the backend (controllers/payments.js): Nigeria pays in NGN, everyone else in USD.
+const MIN_DEPOSIT: Record<string, number> = { NGN: 1500, USD: 10 };
+const money = (cur: string, n: number) => `${cur === "NGN" ? "₦" : "$"}${n.toLocaleString("en-US")}`;
+
 const paymentLogos = {
-  paystack: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Paystack_Logo.png",
-  flutterwave: "public/download.png",
-  paypal: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+    flutterwave: "/download.png",
+  paypal: "/platforms/paypal.svg"
 };
 
 const WalletPage: React.FC = () => {
@@ -84,6 +88,7 @@ useEffect(() => {
         setLoading(false);
         setUserEmail(response.email || "");
         setUserName(response.fullName || "user");
+        setCurrency(String(response.country || "").trim().toLowerCase() === "nigeria" ? "NGN" : "USD");
         const userDetails = response.id;
         setUserId(userDetails);
         // console.log(userDetails);
@@ -99,7 +104,6 @@ useEffect(() => {
         setBalance(Number(response.wallet_balance) || 0);
 
         // Fetch transactions
-        setTransactionsLoading(true);
         try {
           const paymentsData = await getUserPayments(userDetails);
           // Convert payment data to transaction format
@@ -139,6 +143,7 @@ useEffect(() => {
     };
 
     fetchAuthStatus();
+    return live(fetchAuthStatus);
   }, []);
 
    useEffect(() => {
@@ -146,28 +151,18 @@ useEffect(() => {
       setError("");
       setUsdEquivalent(null);
 
-      if (amount && currency && currency !== "USD") {
-        try {
-          const rate = await getRate(currency, "USD");
-          const usd = parseFloat(amount) * rate;
-          setUsdEquivalent(usd.toFixed(2));
-          if (usd < 10) {
-            setError("Minimum of $10 is required.");
-          }
-        } catch (err) {
-          console.error("Rate error:", err);
-          setError("Could not fetch exchange rate.");
-        }
+      if (!amount || !currency) return;
+      if (parseFloat(amount) < MIN_DEPOSIT[currency]) {
+        setError(`Minimum deposit is ${money(currency, MIN_DEPOSIT[currency])}.`);
+        return;
       }
-
-      if (currency === "USD" && parseFloat(amount) < 10) {
-        setError("Minimum of $10 is required.");
-        setUsdEquivalent(amount);
-      }
-
-      if (currency === "USD" && parseFloat(amount) >= 10) {
-        setUsdEquivalent(amount);
-        setError("");
+      if (currency === "USD") return setUsdEquivalent(amount);
+      try {
+        // Display only: the wallet is credited from the amount Flutterwave confirms.
+        const rate = await getRate(currency, "USD");
+        setUsdEquivalent((parseFloat(amount) * rate).toFixed(2));
+      } catch (err) {
+        console.error("Rate error:", err);
       }
     };
 
@@ -184,7 +179,8 @@ useEffect(() => {
 
 
 const getRate = async (from, to) => {
-  const res = await axios.get(`https://v6.exchangerate-api.com/v6/541b3e2b6983ed52d20e9f8e/pair/${from}/${to}`);
+  // Third-party API: must not send our cookies (axios default is withCredentials=true), or CORS blocks it.
+  const res = await axios.get(`https://v6.exchangerate-api.com/v6/541b3e2b6983ed52d20e9f8e/pair/${from}/${to}`, { withCredentials: false });
   // console.log("Exchange rate response:", res.data);
   return res.data.conversion_rate;
 };
@@ -228,8 +224,8 @@ const getRate = async (from, to) => {
 
       // API request
       const response = await fetch(
-        // "http://localhost:8086/api/create-currency-payment",
-        "https://aitool.asoroautomotive.com/api/create-currency-payment",
+        // `${import.meta.env.VITE_API_BASE_URL}/create-currency-payment`,
+        `${import.meta.env.VITE_API_BASE_URL}/create-currency-payment`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -237,9 +233,8 @@ const getRate = async (from, to) => {
             email:userEmail,
             customer_name: userName,
             amount: parseFloat(amount),
-            currency,
             description: `Adding ${amount} ${currency.toUpperCase()} to wallet`,
-            redirect_url: "https://accountshub.onrender.com/verify-payment",
+            redirect_url: `${window.location.origin}/verify-payment`, wallet: "user",
             // payment_method_types: [paymentMethod],
           }),
           credentials:"include"
@@ -277,13 +272,13 @@ const getRate = async (from, to) => {
 
     try {
       const response = await fetch(
-        "https://aitool.asoroautomotive.com/api/create-crypto-payment",
+        `${import.meta.env.VITE_API_BASE_URL}/create-crypto-payment`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             price_amount: Number(priceAmount),
-            order_id: `id for ${userId}`,
+            wallet: "user",
             order_description: "Wallet funding",
           }),
           credentials:"include"
@@ -647,28 +642,18 @@ const getRate = async (from, to) => {
         </div>
       </div>
 
-      {/* 🌍 Currency Selection */}
+      {/* 🌍 Currency (set by account country) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Currency
         </label>
-        <select
-          className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={currency}
-          onChange={(e) => {
-            setCurrency(e.target.value);
-            setAmount("");
-            setUsdEquivalent(null);
-            setError("");
-          }}
-        >
-          <option value="">Select a currency</option>
-          {currencies[paymentMethod].map((cur) => (
-            <option key={cur} value={cur}>
-              {cur.toUpperCase()}
-            </option>
-          ))}
-        </select>
+        <div className="p-3 rounded-xl border bg-gray-100 text-gray-800 font-semibold">
+          {currency === "NGN" ? "NGN — Nigerian Naira (₦)" : "USD — US Dollar ($)"}
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          {currency === "NGN" ? "Accounts in Nigeria pay in Naira." : "Accounts outside Nigeria pay in US Dollars."}{" "}
+          Minimum deposit: {currency && money(currency, MIN_DEPOSIT[currency])}.
+        </p>
       </div>
 
       {/* 💰 Amount Input */}
@@ -679,14 +664,14 @@ const getRate = async (from, to) => {
           </label>
           <input
             type="number"
-            min="1"
+            min={MIN_DEPOSIT[currency]}
             step="any"
             className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter amount"
+            placeholder={`Minimum ${money(currency, MIN_DEPOSIT[currency])}`}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
-          {usdEquivalent && (
+          {usdEquivalent && currency !== "USD" && !error && (
             <p className="text-sm text-green-700 mt-1">
               ≈ ${usdEquivalent} USD
             </p>
@@ -703,11 +688,11 @@ const getRate = async (from, to) => {
         disabled={
           funding ||
           !amount ||
-          !usdEquivalent ||
-          parseFloat(usdEquivalent) < 10
+          !!error ||
+          parseFloat(amount) < MIN_DEPOSIT[currency]
         }
         className={`w-full font-semibold py-3 rounded-xl transition text-center text-white text-sm ${
-          funding || !amount || !usdEquivalent || parseFloat(usdEquivalent) < 10
+          funding || !amount || !!error || parseFloat(amount) < MIN_DEPOSIT[currency]
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-blue-600 hover:bg-blue-700"
         }`}

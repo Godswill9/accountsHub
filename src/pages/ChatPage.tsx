@@ -66,9 +66,6 @@ const ChatPage: React.FC = () => {
           ticket_id: ticketId,
         });
 
-        if (fetchedMessages.length === 0) {
-          toast.info("No messages found for this ticket.");
-        }
         setMessages(fetchedMessages);
 
         // Mark unread admin messages as seen
@@ -100,7 +97,8 @@ const ChatPage: React.FC = () => {
       const fetchedMessages = await messageService.fetchMessages({
         ticket_id: ticketId,
       });
-      setMessages(fetchedMessages);
+      const next = fetchedMessages;
+      setMessages((prev) => (prev.length === next.length && prev[prev.length - 1]?.id === next[next.length - 1]?.id ? prev : next));
 
       // Mark unread admin messages as seen
       fetchedMessages.forEach((msg) => {
@@ -117,7 +115,9 @@ const ChatPage: React.FC = () => {
   };
 
   fetchAndMarkMessages();
-}, []);
+  const timer = setInterval(() => { if (!document.hidden) fetchAndMarkMessages(); }, 4000);
+  return () => clearInterval(timer);
+}, [ticketId, userId]);
 
   const handleSendMessage = async (content: string, type: string = "text") => {
     if (!ticketId || !content.trim() || !userId) return;

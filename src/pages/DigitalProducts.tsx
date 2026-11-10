@@ -1,379 +1,289 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams, Link, useLocation } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { Search, SlidersHorizontal, X, PackageSearch, ShieldCheck, Zap, MessageCircle } from "lucide-react";
 import { fetchAllProducts, Product } from "@/services/digitalProductsService";
 import { getPlatformImage } from "@/utils/platformImages";
 import Header from "@/components/Header";
+import { RatingLine } from "@/components/Ratings";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
+type Sort = "featured" | "price-asc" | "price-desc" | "stock";
+
+// Plain-text preview of a (possibly rich-text) description.
+const preview = (text = "") => {
+  const el = document.createElement("textarea"); // decodes &amp; etc. without rendering HTML
+  el.innerHTML = text.replace(/<[^>]+>/g, " ");
+  return el.value.replace(/\s+/g, " ").trim();
+};
+// Sellers enter formats as "Email and Password | 2FA Enabled | …"
+const formats = (f?: string) => (f || "").split("|").map((x) => x.trim()).filter(Boolean);
 
 const DigitalProducts = () => {
-  const [searchParams] = useSearchParams();
-  const location = useLocation();
-  const searchQuery2 = searchParams.get("search") || "";
-const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-const [minPrice, setMinPrice] = useState<number | null>(null);
-const [maxPrice, setMaxPrice] = useState<number | null>(null);
-const [searchQuery, setSearchQuery] = useState<string>('');
-const [showFilters, setShowFilters] = useState(false);
-const [filtered, setFiltered] = useState({});
+  const [params, setParams] = useSearchParams();
+  const [query, setQuery] = useState(params.get("search") || "");
+  const platform = params.get("platform");
+  const [category, setCategory] = useState<string | null>(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [inStockOnly, setInStockOnly] = useState(true);
+  const [sort, setSort] = useState<Sort>("featured");
+  const [showFilters, setShowFilters] = useState(false);
 
+  const { data: products = [], isLoading, error } = useQuery({ queryKey: ["allProducts"], queryFn: fetchAllProducts });
 
+  useEffect(() => setQuery(params.get("search") || ""), [params]);
+  useEffect(() => setCategory(null), [platform]);
 
-  // useEffect(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
-
-  const {
-    data: products,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["allProducts"],
-    queryFn: fetchAllProducts,
-  });
-
-  // useEffect(() => {
-  //   // Scroll to the top of the page when the component is mounted
-  //   window.scrollTo(0, 0);
-  // }, []);
-
-  const truncateDescription = (description) => {
-    const words = description.split(" ");
-    if (words.length > 10) {
-      return words.slice(0, 5).join(" ") + "...";
-    }
-    return description;
+  const setPlatform = (p: string | null) => {
+    const next = new URLSearchParams(params);
+    p ? next.set("platform", p) : next.delete("platform");
+    setParams(next, { replace: true });
   };
 
-  // // Updated scroll behavior
-  // useEffect(() => {
-  //   if (location.hash) {
-  //     const element = document.querySelector(location.hash);
-  //     if (element) {
-  //       // Add timeout to ensure DOM is ready
-  //       setTimeout(() => {
-  //         const headerOffset = 100;
-  //         const elementPosition = element.getBoundingClientRect().top;
-  //         const offsetPosition =
-  //           elementPosition + window.pageYOffset - headerOffset;
-
-  //         window.scrollTo({
-  //           top: offsetPosition,
-  //           behavior: "smooth",
-  //         });
-  //       }, 100);
-  //     }
-  //   }
-  // }, [location.hash, products]);
-
-  // Group products by platform
-  const groupedProducts = React.useMemo(() => {
-    if (!products) return {};
-    return products.reduce((acc: { [key: string]: Product[] }, product) => {
-      if (!acc[product.platform_name]) {
-        acc[product.platform_name] = [];
-      }
-      acc[product.platform_name].push(product);
-      return acc;
-    }, {});
+  // Platform tabs with live counts.
+  const platforms = useMemo(() => {
+    const counts: Record<string, number> = {};
+    products.forEach((p: Product) => (counts[p.platform_name] = (counts[p.platform_name] || 0) + 1));
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [products]);
-  
 
-//   useEffect(() => {
-//   const newFiltered: Record<string, any[]> = {};
+  const categories = useMemo(
+    () => [...new Set(products.filter((p: Product) => !platform || p.platform_name === platform).map((p: Product) => p.category))],
+    [products, platform]
+  );
 
-//   Object.entries(groupedProducts).forEach(([platform, platformProducts]) => {
-//     const filteredProducts = platformProducts.filter((product) => {
-//       const matchesSearch =
-//         product.platform_name?.toLowerCase().includes(searchQuery2.toLowerCase()) ||
-//         product.description?.toLowerCase().includes(searchQuery2.toLowerCase());
-
-//       return matchesSearch;
-//     });
-
-//     if (filteredProducts.length > 0) {
-//       newFiltered[platform] = filteredProducts;
-//     }
-//   });
-
-//   setFiltered(newFiltered);
-// }, [searchQuery2, groupedProducts]);
-
-
- const filteredGroups = React.useMemo(() => {
-  if (!groupedProducts) return {};
-
-  const filtered: { [key: string]: Product[] } = {};
-
-  Object.entries(groupedProducts).forEach(([platform, platformProducts]) => {
-    const filteredProducts = platformProducts.filter((product) => {
-      const matchesSearch =
-        product.platform_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesPlatform =
-        !selectedPlatform || product.platform_name === selectedPlatform;
-
-      const matchesCategory =
-        !selectedCategory || product.category === selectedCategory;
-
-      const matchesPrice =
-        Number(product.price) >= priceRange[0] && Number(product.price) <= priceRange[1];
-
-      return matchesSearch && matchesPlatform && matchesCategory && matchesPrice;
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const min = minPrice === "" ? -Infinity : Number(minPrice);
+    const max = maxPrice === "" ? Infinity : Number(maxPrice);
+    const list = products.filter((p: Product) => {
+      const price = Number(p.price);
+      return (
+        (!platform || p.platform_name === platform) &&
+        (!category || p.category === category) &&
+        (!inStockOnly || p.stock_quantity > 0) &&
+        price >= min && price <= max &&
+        (!q || `${p.platform_name} ${p.category} ${preview(p.description)}`.toLowerCase().includes(q))
+      );
     });
+    const sorters: Record<Sort, (a: Product, b: Product) => number> = {
+      featured: () => 0,
+      "price-asc": (a, b) => Number(a.price) - Number(b.price),
+      "price-desc": (a, b) => Number(b.price) - Number(a.price),
+      stock: (a, b) => b.stock_quantity - a.stock_quantity,
+    };
+    return [...list].sort(sorters[sort]);
+  }, [products, platform, category, inStockOnly, minPrice, maxPrice, query, sort]);
 
-    if (filteredProducts.length > 0) {
-      filtered[platform] = filteredProducts;
-    }
-  });
+  const grouped = useMemo(() => {
+    const g: Record<string, Product[]> = {};
+    visible.forEach((p) => (g[p.platform_name] ||= []).push(p));
+    return Object.entries(g);
+  }, [visible]);
 
-  return filtered;
-}, [groupedProducts, searchQuery, selectedPlatform, selectedCategory, priceRange]);
-
-
-const displayedGroups = selectedPlatform
-  ? { [selectedPlatform]: filteredGroups[selectedPlatform] || [] }
-  : filteredGroups;
-
+  const activeFilters = Boolean(category || minPrice || maxPrice || !inStockOnly || query);
+  const clearFilters = () => {
+    setCategory(null); setMinPrice(""); setMaxPrice(""); setInStockOnly(true); setQuery("");
+    setPlatform(null);
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="flex min-h-screen flex-col bg-slate-50 text-left">
       <Header />
-<div className="
-  fixed 
-  min-[300px]:top-[19vh] 
-  min-[344px]:top-[14.7vh] 
-  min-[360px]:top-[17.5vh] 
-  min-[390px]:top-[15vh] 
-  min-[400px]:top-[14.5vh] 
-  min-[430px]:top-[14vh] 
-  min-[768px]:top-[12.5vh] 
-  min-[820px]:top-[11vh] 
-  min-[1000px]:top-[19vh] 
-  min-[1100px]:top-[21.5vh] 
-  left-0 
-  right-0 
-  p-1 
-  m-2 
-  z-50 
-  bg-white
-">
-     {/* Header with toggle */}
-     <div className="flex items-center left mb-4 border-b pb-2">
-  <h2 className="text-xl font-semibold text-gray-800 tracking-tight">
-   Filter by
-  </h2>
-  <button
-    onClick={() => setShowFilters(!showFilters)}
-    className="text-sm font-medium text-blue-600 hover:text-blue-700 ml-5 transition"
-  >
-    {showFilters ? "Hide Filters" : "Show Filters"}
-  </button>
-</div>
 
-      {/* Filters */}
-      {showFilters && (
-        <div className="flex flex-wrap gap-4 items-end bg-white p-4 rounded-2xl shadow-md border">
-          {/* Platform Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Platform</label>
-            <select
-              value={selectedPlatform || ""}
-              onChange={(e) =>
-                setSelectedPlatform(e.target.value === "" ? null : e.target.value)
-              }
-              className="border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Platforms</option>
-              {Object.keys(groupedProducts).map((platform) => (
-                <option key={platform} value={platform}>
-                  {platform}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* Title + search */}
+      <section className="border-b border-slate-200 bg-white">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">Browse accounts</h1>
+          <p className="mt-1 text-slate-600">Verified sellers, instant order chat, and payment held until you confirm delivery.</p>
 
-          {/* Category Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Category</label>
-            <select
-              value={selectedCategory || ""}
-              onChange={(e) =>
-                setSelectedCategory(e.target.value === "" ? null : e.target.value)
-              }
-              className="border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Categories</option>
-              {[
-                "Aged Accounts",
-                "New Accounts",
-                "Verified Accounts",
-                "Unverified Accounts",
-                "High Activity Accounts",
-                "Low Activity Accounts",
-              ].map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex flex-col flex-grow">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Search</label>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search accounts..."
-              className="border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-            />
-          </div>
-
-          {/* Price Range */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Price Range ($)</label>
-            <div className="flex gap-2">
-            <input
-  type="number"
-  min={1}
-  value={priceRange[0]}
-  onChange={(e) => {
-    const value = Math.max(1, Number(e.target.value));
-    setPriceRange([value, priceRange[1]]);
-  }}
-  className="w-20 border border-gray-300 rounded px-2 py-1"
-  placeholder="Min"
-/>
-
-              <span>-</span>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <label className="relative flex-1">
+              <span className="sr-only">Search accounts</span>
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
               <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) =>
-                  setPriceRange([priceRange[0], Number(e.target.value)])
-                }
-                className="w-20 border border-gray-300 rounded px-2 py-1"
-                placeholder="Max"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search platform, category or keyword…"
+                className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
               />
+            </label>
+            <div className="flex gap-3">
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as Sort)}
+                aria-label="Sort by"
+                className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand-400 sm:flex-none"
+              >
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: low to high</option>
+                <option value="price-desc">Price: high to low</option>
+                <option value="stock">Most in stock</option>
+              </select>
+              <button
+                onClick={() => setShowFilters((v) => !v)}
+                aria-expanded={showFilters}
+                className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium ${
+                  showFilters ? "border-brand-300 bg-brand-50 text-brand-800" : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                <SlidersHorizontal className="h-4 w-4" aria-hidden /> Filters
+              </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
 
+          {showFilters && (
+            <div className="mt-3 flex flex-wrap items-end gap-4 rounded-lg bg-slate-50 p-4 ring-1 ring-slate-200">
+              <label className="text-sm">
+                <span className="mb-1 block text-slate-600">Min price ($)</span>
+                <input type="number" min="0" value={minPrice} onChange={(e) => setMinPrice(e.target.value)}
+                  className="w-28 rounded-md border border-slate-200 px-2 py-1.5" />
+              </label>
+              <label className="text-sm">
+                <span className="mb-1 block text-slate-600">Max price ($)</span>
+                <input type="number" min="0" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}
+                  className="w-28 rounded-md border border-slate-200 px-2 py-1.5" />
+              </label>
+              <label className="flex items-center gap-2 pb-1.5 text-sm text-slate-700">
+                <input type="checkbox" checked={inStockOnly} onChange={(e) => setInStockOnly(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300 accent-brand-800" />
+                In stock only
+              </label>
+              {activeFilters && (
+                <button onClick={clearFilters} className="pb-1.5 text-sm font-medium text-brand-700 hover:text-brand-900">
+                  Clear all
+                </button>
+              )}
+            </div>
+          )}
 
-     <main className="flex-grow container mx-auto px-4 py-24">
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white p-4 rounded-lg shadow">
-                <Skeleton className="h-6 w-48 mb-4" />
-                <div className="space-y-2">
-                  {[...Array(3)].map((_, j) => (
-                    <Skeleton key={j} className="h-16 w-full" />
-                  ))}
-                </div>
-              </div>
+          {/* Platform tabs */}
+          <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Platforms">
+            <PlatformTab active={!platform} onClick={() => setPlatform(null)} label="All" count={products.length} />
+            {platforms.map(([name, count]) => (
+              <PlatformTab key={name} active={platform === name} onClick={() => setPlatform(name)} label={name} count={count} icon={getPlatformImage(name)} />
             ))}
           </div>
+
+          {categories.length > 1 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {categories.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCategory(category === c ? null : c)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset ${
+                    category === c ? "bg-brand-800 text-white ring-brand-800" : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <main className="container mx-auto flex-grow px-4 py-6">
+        {/* Trust strip */}
+        <div className="mb-6 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
+          <Trust icon={<ShieldCheck className="h-4 w-4 text-emerald-600" />} text="Payment held until you confirm delivery" />
+          <Trust icon={<MessageCircle className="h-4 w-4 text-brand-600" />} text="Chat with the seller on every order" />
+          <Trust icon={<Zap className="h-4 w-4 text-amber-500" />} text="Pay instantly from your wallet" />
+        </div>
+
+        {isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
+          </div>
         ) : error ? (
-          <Alert variant="destructive">
-            <AlertDescription>
-              Unable to load products. Please try again later.
-            </AlertDescription>
-          </Alert>
-        ) : Object.entries(filteredGroups).length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">
-              No products found matching your search.
-            </p>
+          <p className="rounded-xl bg-red-50 p-4 text-red-700">We couldn't load the catalogue. Please refresh the page.</p>
+        ) : grouped.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 rounded-2xl bg-white py-16 text-center ring-1 ring-slate-200">
+            <PackageSearch className="h-10 w-10 text-slate-300" aria-hidden />
+            <p className="text-slate-700">No accounts match your search.</p>
+            <button onClick={clearFilters} className="text-sm font-medium text-brand-700 hover:text-brand-900">Clear filters</button>
           </div>
         ) : (
-          <div className="space-y-6">
-           {Object.entries(displayedGroups).map(([platform, platformProducts]) => (
-                <div
-                  key={platform}
-                  id={platform.toLowerCase()}
-                  className="bg-white w-[99%] mx-auto rounded-lg shadow-sm overflow-hidden scroll-mt-32 sm:w-[65%]"
-                >
-                  <div className="p-4 border-b flex justify-between items-center">
-                    <h2 className="text-l font-bold">{platform} accounts</h2>
-                    <span className="text-sm text-gray-500">
-                      {platformProducts.reduce(
-                        (total, product) => total + product.stock_quantity,
-                        0
-                      )}{" "}
-                      total accounts
-                    </span>
-                  </div>
-                  <div className="divide-y">
-                    {platformProducts.map((product) => {
-                      // Conditionally applying border and border radius
-                      let borderClass = "";
-                      let stockMessage = `${product.stock_quantity} in stock`;
-                      if (product.stock_quantity === 0) {
-                        borderClass = "border-red-800"; // Red border for 0 stock
-                      } else if (product.stock_quantity < 10) {
-                        borderClass = "border-yellow-800"; // Gold border for stock < 10
-                      }
-
-                      return (
-                        <div
-                          key={product.id}
-                          className={`p-4 hover:bg-gray-50 flex items-center justify-between transition-colors border ${borderClass} rounded-lg mb-3`}
-                        >
-                          <div className="flex items-center space-x-4 w-full">
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
-                              <img
-                                src={getPlatformImage(product.platform_name)}
-                                alt={product.platform_name}
-                                className="w-6 h-6 object-contain"
-                              />
-                            </div>
-                            <div className="w-full">
-                              <h3 className="font-medium">
-                                {product.category}
-                              </h3>
-                          <div
-  className="text-sm text-gray-500"
-  dangerouslySetInnerHTML={{ __html: truncateDescription(product.description) }}
-/>
-
-                              <span
-                                className={`block text-sm font-bold ${borderClass} mt-2`}
-                              >
-                                {stockMessage}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <Link
-                              to={`/digital-products/${product.id}`}
-                              className="px-4 py-1 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition-colors"
-                            >
-                              View
-                            </Link>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+          <div className="space-y-8">
+            {grouped.map(([name, items]) => (
+              <section key={name} id={name} aria-labelledby={`h-${name}`}>
+                <div className="mb-3 flex items-center gap-2">
+                  <img src={getPlatformImage(name)} alt="" className="h-6 w-6 object-contain" />
+                  <h2 id={`h-${name}`} className="text-lg font-semibold text-slate-900">{name} accounts</h2>
+                  <span className="text-sm text-slate-500">({items.length})</span>
                 </div>
-              )
-            )}
+                <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
+                  {items.map((p) => <ListingRow key={p.id} product={p} />)}
+                </ul>
+              </section>
+            ))}
           </div>
         )}
       </main>
+
       <Footer />
     </div>
+  );
+};
+
+const PlatformTab = ({ active, onClick, label, count, icon }: { active: boolean; onClick: () => void; label: string; count: number; icon?: string }) => (
+  <button
+    role="tab"
+    aria-selected={active}
+    onClick={onClick}
+    className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium ring-1 ring-inset transition-colors ${
+      active ? "bg-brand-800 text-white ring-brand-800" : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
+    }`}
+  >
+    {icon && <img src={icon} alt="" className="h-4 w-4 rounded-sm bg-white object-contain" />}
+    {label}
+    <span className={`rounded-full px-1.5 text-xs ${active ? "bg-white/20" : "bg-slate-100 text-slate-500"}`}>{count}</span>
+  </button>
+);
+
+const Trust = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
+  <div className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-slate-200">{icon}<span>{text}</span></div>
+);
+
+export const ListingRow = ({ product: p }: { product: Product }) => {
+  const stock = Number(p.stock_quantity);
+  const desc = preview(p.description);
+  return (
+    <li className="group flex flex-col gap-3 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:gap-5 sm:px-5">
+      <Link to={`/digital-products/${p.id}`} className="flex min-w-0 flex-1 items-start gap-4">
+        <img src={getPlatformImage(p.platform_name)} alt="" className="h-12 w-12 shrink-0 rounded-xl bg-white object-contain p-2 ring-1 ring-slate-200" />
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="font-medium text-slate-900 group-hover:text-brand-800">{p.category}</h3>
+            {formats(p.data_format).slice(0, 4).map((f) => (
+              <span key={f} className="rounded-md bg-brand-50 px-1.5 py-0.5 text-xs font-medium text-brand-700">{f}</span>
+            ))}
+          </div>
+          <p className="mt-0.5 line-clamp-2 text-sm text-slate-600">{desc}</p>
+          <RatingLine productId={p.id} sellerId={p.seller_id} />
+        </div>
+      </Link>
+      <div className="flex items-center justify-between gap-5 sm:justify-end">
+        <p className={`text-sm ${stock === 0 ? "text-red-600" : stock < 5 ? "text-amber-600" : "text-slate-500"}`}>
+          {stock === 0 ? "Out of stock" : `${stock} in stock`}
+        </p>
+        <p className="text-right">
+          <span className="block font-semibold tabular-nums text-slate-900">${Number(p.price).toFixed(2)}</span>
+          <span className="text-xs text-slate-500">per account</span>
+        </p>
+        <Link
+          to={`/digital-products/${p.id}`}
+          aria-disabled={stock === 0}
+          className={`rounded-lg px-4 py-2 text-sm font-medium ${
+            stock === 0 ? "pointer-events-none bg-slate-100 text-slate-400" : "bg-brand-800 text-white hover:bg-brand-900"
+          }`}
+        >
+          Buy
+        </Link>
+      </div>
+    </li>
   );
 };
 

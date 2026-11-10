@@ -18,7 +18,25 @@ export default {
       }
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Poppins', 'Inter', 'sans-serif'],
+      },
       colors: {
+        // AccountsHub brand (logo navy #242c5d = 800); blue aliases it.
+        brand: {
+          50: '#eef0fa', 100: '#dde1f4', 200: '#bcc3e9', 300: '#929cd9', 400: '#6773c4',
+          500: '#4752ad', 600: '#343f93', 700: '#2b3478', 800: '#242c5d', 900: '#1c2349', 950: '#121634',
+        },
+        purple: { 50: '#eef0fa', 100: '#dde1f4', 200: '#bcc3e9', 300: '#929cd9', 400: '#6773c4', 500: '#4752ad', 600: '#343f93', 700: '#2b3478', 800: '#242c5d', 900: '#1c2349', 950: '#121634' },
+        indigo: {
+          50: '#eef0fa', 100: '#dde1f4', 200: '#bcc3e9', 300: '#929cd9', 400: '#6773c4',
+          500: '#4752ad', 600: '#343f93', 700: '#2b3478', 800: '#242c5d', 900: '#1c2349', 950: '#121634',
+        },
+        blue: {
+          50: '#eef0fa', 100: '#dde1f4', 200: '#bcc3e9', 300: '#929cd9', 400: '#6773c4',
+          500: '#4752ad', 600: '#343f93', 700: '#2b3478', 800: '#242c5d', 900: '#1c2349', 950: '#121634',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -110,14 +128,11 @@ export default {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-pattern': 'linear-gradient(135deg, #001B44 0%, #0062FF 100%)',
+        'hero-pattern': 'linear-gradient(135deg, #121634 0%, #242c5d 55%, #343f93 100%)',
       },
       boxShadow: {
         // neumorphic: '10px 10px 20px #d1d9e6, -10px -10px 20px #ffffff'
 		 neumorphic: '4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff',
-      },
-      fontFamily: {
-        sans: ['Poppins', 'sans-serif'], // replace 'Poppins' with your font
       },
     }
   },

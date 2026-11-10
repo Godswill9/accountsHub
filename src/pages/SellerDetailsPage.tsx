@@ -56,7 +56,7 @@ export interface Listing {
 async function fetchSellerDetails(sellerId:string) {
   // Replace with your API call
   const response = await fetch(
-        `https://aitool.asoroautomotive.com/api/sellers/${sellerId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/sellers/${sellerId}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -71,7 +71,7 @@ async function fetchSellerDetails(sellerId:string) {
 async function fetchSellerListings(sellerId:string) {
   // Replace with your API call
   const response = await fetch(
-        `https://aitool.asoroautomotive.com/api/seller-digital-products/${sellerId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/seller-digital-products/${sellerId}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -235,25 +235,6 @@ return (
               </div>
 
               {/* Orders & Policy */}
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-green-700 font-semibold">
-                  <span>Successful Orders:</span>
-                  <span>{seller.total_sales}</span>
-                </div>
-
-                {/* <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-md px-3 py-2 text-sm">
-                  <RefreshCw className="text-green-600 w-5 h-5" />
-                  <span>Return & Refund Policy: <span className="text-gray-700 ml-1">Not available</span></span>
-                </div> */}
-              </div>
-
-              {/* Report Button */}
-              <div className="flex items-center justify-end mt-4">
-                <Button variant="destructive">
-                  <AlertTriangle className="mr-2 w-4 h-4" />
-                  Report Seller
-                </Button>
-              </div>
             </>
           )}
         </div>

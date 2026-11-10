@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { live } from "@/lib/live";
 import { Filter, Bell, Trash2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
   getNotifications,
+  markNotificationAsSeen,
   deleteNotification,
   deleteAllNotifications,
 } from "@/services/notificationService";
@@ -38,6 +40,7 @@ const NotificationsPage: React.FC = () => {
     };
 
     checkAuthStatus();
+    return live(checkAuthStatus);
   }, []);
 
 
@@ -50,6 +53,8 @@ const NotificationsPage: React.FC = () => {
     try {
       const data = await getNotifications(id);
       setNotifications(data || []);
+      // Opening the page counts as reading them (clears the header badge).
+      (data || []).filter((n) => n.seen !== "SEEN").forEach((n) => markNotificationAsSeen(n.id).catch(() => {}));
     } catch (error) {
       toast({
         title: "Failed to load notifications",
@@ -131,11 +136,16 @@ const NotificationsPage: React.FC = () => {
                       {notification.title}
                     </h2>
                     <p className="text-gray-600 text-sm">
-                      {notification.details}
+                      {notification.notification_details}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
                       {new Date(notification.created_at).toLocaleString()}
                     </p>
+                    {notification.link && (
+                      <Button variant="outline" size="sm" className="mt-2 h-8 text-xs" onClick={() => navigate(notification.link)}>
+                        Open conversation
+                      </Button>
+                    )}
                   </div>
                   <Button
                     variant="ghost"

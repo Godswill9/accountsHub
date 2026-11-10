@@ -113,8 +113,8 @@ const OrderChatPage: React.FC = () => {
 
 const fetchChatMessages = async (orderId) => {
   try {
-    const response = await fetch(`https://aitool.asoroautomotive.com/api/${orderId}`, {
-    // const response = await fetch(`http://localhost:8086/api/${orderId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/${orderId}`, {
+    // const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/${orderId}`, {
       method: "GET",
        credentials:"include"
     });
@@ -135,7 +135,7 @@ const fetchChatMessages = async (orderId) => {
  const fetchSelectedConversationData = async (orderId: string) => {
     try {
       const response = await axios.get(
-        `https://aitool.asoroautomotive.com/api/conversation/${orderId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/conversation/${orderId}`,
         { withCredentials: true }
       );
       
@@ -152,7 +152,7 @@ const fetchChatMessages = async (orderId) => {
     await Promise.all(
       messageIds.map(async (id) => {
         await axios.patch(
-          `https://aitool.asoroautomotive.com/api/seen/${id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/seen/${id}`,
           {},
           { withCredentials: true }
         );
@@ -184,7 +184,8 @@ const fetchChatMessages = async (orderId) => {
         };
       });
 
-      setMessages(processed);
+      const next = processed;
+      setMessages((prev) => (prev.length === next.length && prev[prev.length - 1]?.message_id === next[next.length - 1]?.message_id ? prev : next));
 
         // Filter unseen messages from the buyer
     const unseenMessageIds = processed
@@ -199,9 +200,11 @@ const fetchChatMessages = async (orderId) => {
     setIsLoading(false);
   };
 
-  if (orderId) {
-    loadMessages();
-  }
+  if (!orderId) return;
+  loadMessages();
+  // Near-real-time: poll while the tab is visible.
+  const timer = setInterval(() => { if (!document.hidden) loadMessages(); }, 4000);
+  return () => clearInterval(timer);
 }, [orderId]);
 
 
@@ -217,8 +220,8 @@ const handleSendMessage = async (content: string, type: string = "text") => {
       message: content.trim(),
     };
 
-    const response = await fetch("https://aitool.asoroautomotive.com/api/sendMessage", {
-    // const response = await fetch("http://localhost:8086/api/sendMessage", {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/sendMessage`, {
+    // const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(chatData),
@@ -277,8 +280,8 @@ const handleSendMessage = async (content: string, type: string = "text") => {
       formData.append("files", file);
     });
 
-    const response = await fetch("https://aitool.asoroautomotive.com/api/sendMessage", {
-    // const response = await fetch("http://localhost:8086/api/sendMessage", {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/sendMessage`, {
+    // const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/sendMessage`, {
       method: "POST",
       body: formData,
        credentials:"include"
@@ -308,7 +311,7 @@ const handleAcceptClose = async (order_id) => {
   try {
     // Step 1: Close the conversation
     const closeRes = await axios.put(
-      `https://aitool.asoroautomotive.com/api/conversation/${order_id}/status`,
+      `${import.meta.env.VITE_API_BASE_URL}/conversation/${order_id}/status`,
       { status: "closed" },
       { withCredentials: true }
     );
@@ -316,7 +319,7 @@ const handleAcceptClose = async (order_id) => {
     if (closeRes.data.message === "Status updated") {
       // Step 2: Mark the order as completed
       const completeRes = await axios.put(
-        `https://aitool.asoroautomotive.com/api/completeOrder/${order_id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/completeOrder/${order_id}`,
         {},
         { withCredentials: true }
       );
@@ -342,7 +345,7 @@ const handleAcceptClose = async (order_id) => {
 
 const handleRejectClose = async(order_id) => {
   const res = await axios.put(
-        `https://aitool.asoroautomotive.com/api/conversation/${order_id}/status`,
+        `${import.meta.env.VITE_API_BASE_URL}/conversation/${order_id}/status`,
         {
           status: "open"
         },
@@ -412,6 +415,9 @@ return (
           onSendFiles={(content, files) => handleSendFiles(content, files)}
           userId={userId || ""}
           status={chatStatus}
+          accept="image/jpeg,image/png,image/gif,image/webp,.txt,text/plain"
+          allowFile={(f) => /\.(png|jpe?g|gif|webp|txt)$/i.test(f.name)}
+          fileRule="Only images (JPG, PNG, GIF, WEBP) and .txt files can be sent."
         />
 
         {/* Overlay for Closed */}
