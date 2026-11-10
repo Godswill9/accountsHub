@@ -1,96 +1,75 @@
-import React, { useState } from "react";
-import { Search } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { Search, ShieldCheck, Star, LifeBuoy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { RotatingWords } from "@/components/RotatingWords";
+import { fetchAllProducts, Product } from "@/services/digitalProductsService";
+import { getPlatformImage } from "@/utils/platformImages";
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const { data: products = [] } = useQuery({ queryKey: ["allProducts"], queryFn: fetchAllProducts });
 
-  const handleSearch = (e: React.FormEvent) => {
+  const stats = useMemo(() => ({ platforms: [...new Set(products.map((p: Product) => p.platform_name))] }), [products]);
+
+  const search = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/digital-products?search=${encodeURIComponent(searchQuery)}`);
-    }
-  };
-  const handleViewAllAccounts = () => {
-    navigate("/digital-products");
+    navigate(searchQuery.trim() ? `/digital-products?search=${encodeURIComponent(searchQuery.trim())}` : "/digital-products");
   };
 
   return (
     <div className="bg-hero-pattern text-white">
-      <div className="container mx-auto px-4 py-8 md:py-12 lg:py-20">
-        <div className="max-w-4xl mx-auto text-center animate-fade-in">
-          {/* <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-20 px-8 text-center"> */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-wide">
-            Accounts <span style={{ fontWeight: "100" }}>Hub</span>
+      <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20">
+        <div className="mx-auto max-w-3xl text-center animate-fade-in">
+          <h1 className="mb-5 text-4xl font-extrabold tracking-wide sm:text-5xl md:text-6xl">
+            Accounts <span style={{ fontWeight: 100 }}>Hub</span>
           </h1>
-
-          <p className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-8">
-            Unlock the power of premium social media accounts to elevate your
-            online presence, boost your influence, and accelerate your growth.
+          <p className="mx-auto mb-6 max-w-2xl text-lg text-white/85 sm:text-xl">
+            Ready-to-use social media accounts from rated sellers. Your payment is held until you confirm delivery.
           </p>
 
-          <div className="flex justify-center items-center gap-2 mb-4">
-            {/* <p className="text-lg sm:text-xl md:text-2xl">Featuring:</p> */}
+          <div className="mb-8 flex items-center justify-center gap-2">
             <RotatingWords />
           </div>
 
-          <button
-            onClick={handleViewAllAccounts}
-            className="px-8 py-3 bg-white mt-8 mb-8 text-blue-600 font-semibold text-lg rounded-lg shadow-lg hover:bg-gray-100 transition-all"
-          >
-            Explore Our Accounts
-          </button>
-          {/* </div> */}
-
-          {/* Search bar */}
-          {/* <form
-            onSubmit={handleSearch}
-            className="mt-4 md:mt-8 max-w-2xl mx-auto relative"
-          >
-            <div className="flex flex-col sm:flex-row items-center bg-white rounded-lg sm:rounded-full overflow-hidden shadow-lg">
+          <form onSubmit={search} className="mx-auto flex max-w-xl overflow-hidden rounded-xl bg-white p-1.5 shadow-lg">
+            <label className="relative flex-1">
+              <span className="sr-only">Search accounts</span>
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden />
               <input
-                type="text"
-                placeholder="Search digital products..."
-                className="w-full flex-grow px-4 sm:px-6 py-3 sm:py-4 text-gray-800 focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Try “aged Facebook” or “TikTok followers”"
+                className="w-full bg-transparent py-3 pl-10 pr-3 text-slate-900 outline-none placeholder:text-slate-400"
               />
-              <button
-                type="submit"
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-4 transition-colors duration-300 flex items-center justify-center mt-1 sm:mt-0"
-              >
-                <Search className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="ml-2">Search</span>
-              </button>
-            </div>
-          </form> */}
+            </label>
+            <button type="submit" className="rounded-lg bg-brand-800 px-5 font-medium text-white hover:bg-brand-900">
+              Search
+            </button>
+          </form>
 
-          {/* Category pills - replaced with social media platforms */}
-          <div className="flex flex-wrap justify-center mt-6 gap-2 px-2">
-            <div className="bg-white/10 backdrop-blur-sm text-white rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm border border-white/20">
-              Instagram
+          {stats.platforms.length > 0 && (
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {stats.platforms.map((name) => (
+                <button
+                  key={name}
+                  onClick={() => navigate(`/digital-products?platform=${encodeURIComponent(name)}`)}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm backdrop-blur-sm hover:bg-white/20"
+                >
+                  <img src={getPlatformImage(name)} alt="" className="h-4 w-4 rounded-sm bg-white object-contain" />
+                  {name}
+                </button>
+              ))}
             </div>
-            <div className="bg-white/10 backdrop-blur-sm text-white rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm border border-white/20">
-              Facebook
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm text-white rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm border border-white/20">
-              Twitter
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm text-white rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm border border-white/20">
-              LinkedIn
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm text-white rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm border border-white/20">
-              TikTok
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm text-white rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm border border-white/20">
-              YouTube
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm text-white rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm border border-white/20">
-              Snapchat
-            </div>
-          </div>
+          )}
+
+          {/* Reassurance instead of live counts: stock/platform/rating numbers reveal more than they sell. */}
+          <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap justify-center gap-x-6 gap-y-2 border-t border-white/15 pt-6 text-sm text-white/80">
+            <li className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-300" aria-hidden />Payment held until delivery</li>
+            <li className="inline-flex items-center gap-2"><Star className="h-4 w-4 text-amber-300" aria-hidden />Rated sellers</li>
+            <li className="inline-flex items-center gap-2"><LifeBuoy className="h-4 w-4 text-sky-300" aria-hidden />Ticket support</li>
+          </ul>
         </div>
       </div>
     </div>

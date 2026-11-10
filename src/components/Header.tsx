@@ -1,3 +1,5 @@
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { live } from "@/lib/live";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, User, ChevronDown, Menu, Globe, Flag, X, LogOut, AlertTriangle, AlertCircle } from "lucide-react";
@@ -31,6 +33,7 @@ const totalUnread = Object.values(unreadCounts).reduce((sum, count) => sum + cou
 const totalUnreadConversations = Object.keys(unreadCounts).length;
 const [accountBanStatus, setAccountBanStatus] = useState(false)
 const [accountSuspendedStatus,setAccountSuspendedStatus] = useState(false)
+const [suspendedUntil, setSuspendedUntil] = useState<string | null>(null)
    const [messagesCount, setMessagesCount] = useState<Record<string, number>>({});
 
 
@@ -42,7 +45,7 @@ const [accountSuspendedStatus,setAccountSuspendedStatus] = useState(false)
    const fetchMessagesFromId = async (orderId: string) => {
   try {
     const res = await axios.get(
-      `https://aitool.asoroautomotive.com/api/${orderId}`, {withCredentials:true}
+      `${import.meta.env.VITE_API_BASE_URL}/${orderId}`, {withCredentials:true}
     );
 
     const unseenFromSeller = res.data.filter(
@@ -70,7 +73,7 @@ const unreadConversationsCount = Object.values(messagesCount).filter(
    const fetchMessages= async(sellerId: string)=>{
        try {
         const res = await axios.get(
-          `https://aitool.asoroautomotive.com/api/conversations/${sellerId}`, {withCredentials:true}
+          `${import.meta.env.VITE_API_BASE_URL}/conversations/${sellerId}`, {withCredentials:true}
         );
        
         return res.data.conversations
@@ -93,7 +96,8 @@ const unreadConversationsCount = Object.values(messagesCount).filter(
         } else {
           //banning and suspension mechanism
       const isSuspended = response?.acc_status === "Suspended";
-const isBanned = response?.acc_status && response.acc_status !== "Okay";
+const isBanned = response?.acc_status === "Banned"; // suspended is its own state, not a ban
+setSuspendedUntil(response?.date_unsuspended || null);
 setAccountBanStatus(isBanned);
 setAccountSuspendedStatus(isSuspended);
 // console.log(accountBanStatus, accountSuspendedStatus)
@@ -119,6 +123,7 @@ setAccountSuspendedStatus(isSuspended);
     };
 
     checkAuthStatus();
+    return live(checkAuthStatus, 15000); // many requests per run (one per order chat), so a slower pace
   }, []);
 
   const logout = async () =>{
@@ -134,7 +139,7 @@ setAccountSuspendedStatus(isSuspended);
  const fetchNotifications = async (id) => {
   try {
     const data = await getNotifications(id);
-    const unseen = (data || []).filter(item => item.seen_by_user === null);
+    const unseen = (data || []).filter(item => item.seen !== "SEEN");
     setNotifications(unseen);
   } catch (error) {
     // handle error
@@ -213,20 +218,22 @@ useEffect(() => {
   <div className="max-w-4xl mx-auto flex items-start gap-2 text-center sm:text-left flex-wrap justify-center sm:justify-start">
     <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
     <span>
-      This user account is currently <span className="font-semibold">suspended</span>. 
+      Your account is <span className="font-semibold">suspended</span>
+      {suspendedUntil ? ` until ${new Date(suspendedUntil).toLocaleString()}` : ""}. You can't buy or withdraw until then.
       Message Support for more information.
     </span>
   </div>
 </div> )}
 
       {/* Top dark navbar */}
-      <div className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white py-3">
+      <div className="bg-brand-900 text-white py-3">
         <div className="container mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
           <div className="text-sm truncate max-w-[200px] sm:max-w-none">
-            <span>AccountsHub - Users</span>
+            <span className="notranslate" translate="no">AccountsHub - Store</span>
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
+            <LanguageSwitcher className="text-white" />
             <a href="#" className="text-sm flex items-center">
               <span className="mr-1 hidden sm:inline">@accountshub</span>
             </a>
@@ -280,10 +287,9 @@ useEffect(() => {
             <div className="flex items-center">
               <Link to="/" className="flex items-center text-blue-900 mr-4 h-12">
                 <img
-                  src="/lovable-uploads\b8bc2363-f8b3-49a4-bec6-1490e3aa106a-removebg-preview.png"
+                  src="/logo.png"
                   alt="Accounts Hub Logo"
-                  className="w-auto mr-2"
-                  style={{ height: "120px" }}
+                  className="h-9 w-auto mr-2"
                 />
               </Link>
 
@@ -358,8 +364,8 @@ useEffect(() => {
   </div>
 )}
                     <a
-                      href="https://accountshubsellers.onrender.com"
-                      className="text-sm font-medium text-purple-600 hover:text-purple-700 px-4 py-2"
+                      href={import.meta.env.VITE_SELLER_URL}
+                      className="text-sm font-medium text-brand-600 hover:text-brand-800 px-4 py-2"
                     >
                       Become a seller
                     </a>
@@ -443,8 +449,8 @@ useEffect(() => {
             <div className="hidden md:flex md:items-center md:space-x-4">
               {isAuthenticated && <WalletButton />}
               <a
-                href="https://accountshubsellers.onrender.com"
-                className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center"
+                href={import.meta.env.VITE_SELLER_URL}
+                className="text-sm font-medium text-brand-600 hover:text-brand-800 flex items-center"
               >
                 Become a seller
               </a>

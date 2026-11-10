@@ -2,11 +2,11 @@ import axios from "axios";
 import { API_BASE_URL } from "@/config/api";
 
 export const NOTIFICATION_ENDPOINTS = {
-  CREATE: `${API_BASE_URL}/notifications/create`,
-  LIST: (userId: string) => `${API_BASE_URL}/notifications/${userId}`,
-  DELETE: (id: string) => `${API_BASE_URL}/notifications/${id}`,
-  DELETE_ALL: (userId: string) => `${API_BASE_URL}/notifications/user/${userId}/delete-all`,
-  MARK_AS_SEEN: (id: string) => `${API_BASE_URL}/notifications/${id}/seen`,
+  CREATE: `${API_BASE_URL}/notify/buyer`,
+  LIST: (userId: string) => `${API_BASE_URL}/notifications/buyer/${userId}`,
+  DELETE: (id: string) => `${API_BASE_URL}/notifications/buyer/${id}`,
+  DELETE_ALL: (_userId: string) => `${API_BASE_URL}/notifications/buyer-all`,
+  MARK_AS_SEEN: (id: string) => `${API_BASE_URL}/notice-seen/${id}`,
 };
 
 export const createNotification = async (data: any) => {
@@ -22,7 +22,7 @@ export const createNotification = async (data: any) => {
 export const getNotifications = async (userId: string) => {
   try {
     const response = await axios.get(NOTIFICATION_ENDPOINTS.LIST(userId),{withCredentials:true});
-    return response.data;
+    return response.data?.data ?? [];
   } catch (error) {
     console.error("Error fetching notifications:", error);
     throw error;
@@ -51,7 +51,7 @@ export const deleteAllNotifications = async (userId: string) => {
 
 export const markNotificationAsSeen = async (notificationId: string) => {
   try {
-    const response = await axios.put(NOTIFICATION_ENDPOINTS.MARK_AS_SEEN(notificationId), {withCredentials:true});
+    const response = await axios.put(NOTIFICATION_ENDPOINTS.MARK_AS_SEEN(notificationId), {}, {withCredentials:true});
     return response.data;
   } catch (error) {
     console.error("Error marking notification as seen:", error);

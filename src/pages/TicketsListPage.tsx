@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { live } from "@/lib/live";
 import { useNavigate } from "react-router-dom";
 import UserHeader from "@/components/UserHeader";
 import Footer from "@/components/Footer";
@@ -62,12 +63,7 @@ const totalUnreadConversations = Object.keys(unreadCounts).length;
           setUserId(response.id);
           const userTickets = await ticketService.getUserTickets(response.id);
 
-          if (Array.isArray(userTickets)) {
-  setTickets(userTickets);
-} else {
-  toast.error("No tickets found.");
-  setTickets([]);
-}
+          setTickets(Array.isArray(userTickets) ? userTickets : []);
         }
       } catch (error) {
         console.error("Authentication error", error);
@@ -77,6 +73,7 @@ const totalUnreadConversations = Object.keys(unreadCounts).length;
     };
 
     checkAuthStatus();
+    return live(checkAuthStatus, 10000);
   }, []);
 
     useEffect(() => {

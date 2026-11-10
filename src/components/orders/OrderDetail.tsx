@@ -1,174 +1,138 @@
-
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { deleteOrder } from '@/services/orderService';
-import { toast } from '@/hooks/use-toast';
-import { ArrowLeft, Clock, CloudCog, Edit, MessageCircle, Trash2 } from 'lucide-react';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Check, MessageCircle, Store } from "lucide-react";
+import { getPlatformImage } from "@/utils/platformImages";
+import { orderRef } from "./OrderList";
+import { RateOrder } from "@/components/Ratings";
 
 interface OrderDetailProps {
   order: {
     order_id: string;
-    productName: string;
-    productId: string;
-    quantity: number;
-    date: string;
-    status: 'pending' | 'processing' | 'completed' | 'cancelled';
-    totalAmount: number;
-    notes?: string;
-    paymentMethod?: string;
+    status: "pending" | "processing" | "completed" | "cancelled";
     created_at: string;
+    updated_at?: string;
     item_name: string;
     item_id: string;
     amount: string;
-    seller_id?:string
+    quantity: number;
+    seller_id?: string;
+    has_issue?: number;
+    expected_completion_date?: string | null;
+    notes?: string;
   };
 }
 
+const fmt = (d?: string | null) =>
+  d ? new Date(d).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }) : "";
+
 const OrderDetail: React.FC<OrderDetailProps> = ({ order }) => {
   const navigate = useNavigate();
+  const [platform, ...rest] = (order.item_name || "").split("/");
+  const category = rest.join("/");
+  const qty = Number(order.quantity);
+  const confirmed = Boolean(order.expected_completion_date);
+  const completed = order.status === "completed";
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'processing':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  // Real lifecycle: paid at purchase -> seller delivers in chat -> buyer confirms -> seller paid after hold.
+  const steps = [
+    { title: "Paid", detail: `$${Number(order.amount).toFixed(2)} from your wallet · ${fmt(order.created_at)}`, done: true },
+    { title: "Seller delivers your account details", detail: "Delivery happens in the order chat.", done: confirmed || completed },
+    {
+      title: "You confirm delivery",
+      detail: confirmed ? "Thanks! The seller is paid after a short hold period." : "Confirm in the order chat once you've checked the account.",
+      done: confirmed || completed,
+    },
+    { title: "Completed", detail: completed ? fmt(order.updated_at) : "", done: completed },
+  ];
+  const current = steps.findIndex((s) => !s.done);
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this order?')) {
-      try {
-        await deleteOrder(order.order_id);
-        toast({
-          title: "Order deleted",
-          description: `Order #${order.order_id} has been deleted successfully.`,
-        });
-        navigate('/orders');
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Failed to delete order",
-          description: "There was an error deleting your order. Please try again.",
-        });
-      }
-    }
-  };
+  const statusLabel = completed ? "Completed" : order.status === "cancelled" ? "Cancelled" : confirmed ? "Delivered" : "Awaiting delivery";
+  const statusClass = completed
+    ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+    : order.status === "cancelled"
+      ? "bg-red-50 text-red-700 ring-red-200"
+      : "bg-amber-50 text-amber-700 ring-amber-200";
 
   return (
-    <Card className="max-w-3xl mx-auto">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center">
-              Order for {order.item_name}
-              <Badge variant="outline" className={`ml-3 ${getStatusColor(order.status)}`}>
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-              </Badge>
-            </CardTitle>
-            <CardDescription>Placed on {new Date(order.created_at).toLocaleString()}</CardDescription>
-          </div>
-      
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Product Information</h3>
-            <div className="mt-2 border rounded-md p-3">
-              <p><span className="font-medium">Product Name:</span> {order.item_name}</p>
-              <p><span className="font-medium">Product ID:</span> {order.item_id}</p>
-              <p><span className="font-medium">Quantity:</span> {order.quantity}</p>
+    <div className="mx-auto max-w-3xl space-y-4">
+      <button onClick={() => navigate("/orders")} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900">
+        <ArrowLeft className="h-4 w-4" aria-hidden /> My orders
+      </button>
+
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+        <div className="flex items-start gap-4">
+          <img src={getPlatformImage(platform || "")} alt="" className="h-14 w-14 shrink-0 rounded-xl bg-white object-contain p-2 ring-1 ring-slate-200" />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl font-semibold text-slate-900">{platform}</h1>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${statusClass}`}>{statusLabel}</span>
             </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Payment Information</h3>
-            <div className="mt-2 border rounded-md p-3">
-              <p><span className="font-medium">Total Amount:</span> ${Number(order.amount).toFixed(2)}</p>
-              <p><span className="font-medium">Payment Method:</span> {order.paymentMethod || 'Wallet'}</p>
-              <p>
-                <span className="font-medium">Payment Status:</span> 
-                <span className={order.status === 'pending' ? 'text-green-600' : 'text-yellow-600'}>
-                  {order.status === 'pending' ? 'Paid' : 'Pending'}
-                </span>
-              </p>
-            </div>
+            <p className="text-slate-600">{category || "Account"}</p>
+            <p className="mt-1 text-xs text-slate-400">Order {orderRef(order.order_id)} · {fmt(order.created_at)}</p>
           </div>
         </div>
 
-        {order.notes && (
+        <dl className="mt-6 grid grid-cols-3 gap-3 rounded-xl bg-slate-50 p-4 text-center">
           <div>
-            <h3 className="text-sm font-medium text-gray-500">Additional Notes</h3>
-            <div className="mt-2 border rounded-md p-3">
-              <p>{order.notes}</p>
-            </div>
+            <dt className="text-xs text-slate-500">Total</dt>
+            <dd className="mt-1 font-semibold tabular-nums text-slate-900">${Number(order.amount).toFixed(2)}</dd>
           </div>
+          <div>
+            <dt className="text-xs text-slate-500">Quantity</dt>
+            <dd className="mt-1 font-semibold text-slate-900">{qty} {qty === 1 ? "account" : "accounts"}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-slate-500">Payment</dt>
+            <dd className="mt-1 font-semibold text-emerald-700">Paid</dd>
+          </div>
+        </dl>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <button
+            onClick={() => navigate(`/conversation/${order.order_id}`)}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-900"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden /> Open order chat
+          </button>
+          {order.seller_id && (
+            <Link
+              to={`/about-seller/${order.seller_id}`}
+              className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+            >
+              <Store className="h-4 w-4" aria-hidden /> View seller
+            </Link>
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+        <h2 className="text-sm font-semibold text-slate-900">Progress</h2>
+        <ol className="mt-4 space-y-0">
+          {steps.map((s, i) => (
+            <li key={s.title} className="relative flex gap-3 pb-5 last:pb-0">
+              {i < steps.length - 1 && (
+                <span className={`absolute left-[11px] top-6 h-full w-px ${s.done ? "bg-emerald-300" : "bg-slate-200"}`} aria-hidden />
+              )}
+              <span
+                className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                  s.done ? "bg-emerald-500 text-white" : i === current ? "bg-brand-800 text-white" : "bg-slate-100 text-slate-400"
+                }`}
+              >
+                {s.done ? <Check className="h-3.5 w-3.5" aria-hidden /> : i + 1}
+              </span>
+              <div className="min-w-0">
+                <p className={`text-sm font-medium ${s.done || i === current ? "text-slate-900" : "text-slate-400"}`}>{s.title}</p>
+                {s.detail && <p className="text-sm text-slate-500">{s.detail}</p>}
+              </div>
+            </li>
+          ))}
+        </ol>
+        {(confirmed || completed) && <RateOrder orderId={order.order_id} />}
+        {order.has_issue === 1 && confirmed && (
+          <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">An issue was raised on this order; payout is on hold until it's resolved.</p>
         )}
-
-        <div>
-          <h3 className="text-sm font-medium text-gray-500">Order Timeline</h3>
-          <div className="mt-2 space-y-3">
-            <div className="flex items-start">
-              <div className="flex-none mr-3">
-                <Clock className="h-5 w-5 text-blue-500" />
-              </div>
-              <div>
-                <p className="font-medium">Order placed</p>
-                <p className="text-sm text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
-              </div>
-            </div>
-            {/* Add more timeline events as needed */}
-          </div>
-        </div>
-      </CardContent>
-<CardFooter className="flex flex-col lg:flex-row justify-between items-center gap-6 w-full bg-muted p-4 rounded-xl">
-  {/* Back Button */}
-  <Button
-    variant="outline"
-    onClick={() => navigate('/orders')}
-    className="w-full lg:w-auto"
-  >
-    <ArrowLeft className="h-4 w-4 mr-2" />
-    Back to Orders
-  </Button>
-
-  {/* Seller Help Section */}
-  <div className="flex flex-col items-center text-center lg:items-start lg:text-left w-full lg:w-auto gap-3">
-    <p className="text-sm text-muted-foreground">
-      Need help with this order? Contact the seller:
-    </p>
-
-    {/* Message Seller */}
-    <Button
-      variant="outline"
-      onClick={() => navigate(`/conversation/${order.order_id}`)}
-      className="w-full lg:w-auto"
-    >
-      <MessageCircle className="h-4 w-4 mr-2" />
-      Message Seller
-    </Button>
-
-    {/* View Seller Profile */}
-    <Link
-      to={`/about-seller/${order.seller_id}`}
-      className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition w-full lg:w-auto"
-    >
-      View Seller
-    </Link>
-  </div>
-</CardFooter>
-
-
-    </Card>
+      </section>
+    </div>
   );
 };
 

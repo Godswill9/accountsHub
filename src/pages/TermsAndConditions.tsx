@@ -11,7 +11,7 @@ const TermsAndConditions = () => {
       <div className="border-b border-gray-200 py-6 px-6 md:px-12">
         <div className="max-w-4xl mx-auto flex items-center space-x-4">
           <img
-            src="https://accountshub.onrender.com/lovable-uploads/b8bc2363-f8b3-49a4-bec6-1490e3aa106a-removebg-preview.png"
+            src="/logo.png"
             alt="Accounts Hub Logo"
             className="w-10 h-10 object-contain"
           />

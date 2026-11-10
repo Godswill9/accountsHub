@@ -22,7 +22,7 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({
   onWithdrawClick,
 }) => {
   return (
-    <Card className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+    <Card className="bg-gradient-to-r from-brand-700 to-brand-900 text-white">
       <CardHeader className="pb-2">
         <CardDescription className="text-white/80 flex items-center">
           <Wallet className="h-4 w-4 mr-1" />

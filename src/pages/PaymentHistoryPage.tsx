@@ -58,7 +58,7 @@ useEffect(() => {
             allPayments.forEach(async (payment) => {
               if (!payment.seen_by_user) {
                 try {
-                  await fetch(`https://aitool.asoroautomotive.com/api/user-payment-seen/${payment.payment_id}`, {
+                  await fetch(`${import.meta.env.VITE_API_BASE_URL}/user-payment-seen/${payment.payment_id}`, {
                     method: "PUT",
                     headers: {
                       "Content-Type": "application/json",

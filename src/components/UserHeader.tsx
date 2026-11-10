@@ -1,3 +1,4 @@
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, ChevronDown, Menu, Globe, Flag } from "lucide-react";
@@ -34,13 +35,14 @@ const UserHeader = () => {
   return (
     <header className="w-full bg-white shadow-sm">
       {/* Top dark navbar */}
-      <div className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white py-3">
+      <div className="bg-brand-900 text-white py-3">
         <div className="container mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
           <div className="text-sm truncate max-w-[200px] sm:max-w-none">
-            <span>Accounts Hub - Social Media Accounts Store</span>
+            <span className="notranslate" translate="no">AccountsHub - Store</span>
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
+            <LanguageSwitcher className="text-white" />
             <a href="#" className="text-sm flex items-center">
               <span className="mr-1 hidden sm:inline">@accountshub</span>
             </a>
@@ -92,10 +94,9 @@ const UserHeader = () => {
             <div className="flex items-center">
               <Link to="/" className="flex items-center text-blue-900 mr-4">
                 <img
-                  src="/lovable-uploads\b8bc2363-f8b3-49a4-bec6-1490e3aa106a-removebg-preview.png"
+                  src="/logo.png"
                   alt="Accounts Hub Logo"
-                  className="w-auto mr-2"
-                  style={{ height: "150px" }}
+                  className="h-9 w-auto mr-2"
                 />
               </Link>
 
@@ -200,7 +201,7 @@ const UserHeader = () => {
                     </Link>
                     <a
                       href="#"
-                      className="text-sm font-medium text-purple-600 hover:text-purple-700 px-4 py-2"
+                      className="text-sm font-medium text-brand-600 hover:text-brand-800 px-4 py-2"
                     >
                       Become a seller
                     </a>
@@ -300,8 +301,8 @@ const UserHeader = () => {
             <div className="hidden md:flex md:items-center md:space-x-4">
               <WalletButton />
               <a
-                href="https://accountshubsellers.onrender.com"
-                className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center"
+                href={import.meta.env.VITE_SELLER_URL}
+                className="text-sm font-medium text-brand-600 hover:text-brand-800 flex items-center"
               >
                 Become a seller
               </a>

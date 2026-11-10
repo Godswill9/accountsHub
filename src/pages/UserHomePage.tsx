@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import FeaturedProducts from "@/components/FeaturedProducts";
+import { HowItWorks, WhyUs, Faq, SellerCta } from "@/components/HomeSections";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -62,20 +63,16 @@ const UserHomePage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <main className="flex-grow container mx-auto px-4">
+      <main className="flex-grow">
         <Hero />
+        {/* Admin-curated listings (Admin > Homepage products) */}
         <section className="container mx-auto px-4 py-12">
-          {/* <section className="container mx-auto px-4 py-12"> */}
-          {/* <div className="text-center mb-8">
-            <Button
-              onClick={handleViewAllAccounts}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              View All Accounts
-            </Button>
-          </div> */}
           <FeaturedProducts />
         </section>
+        <HowItWorks />
+        <WhyUs />
+        <Faq />
+        <SellerCta />
       </main>
       <Footer />
     </div>

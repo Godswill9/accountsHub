@@ -12,6 +12,9 @@ interface ChatWindowProps {
   onSendMessage: (content: string) => Promise<void>;
   onSendFiles: (content: string, files: File[]) => Promise<void>;
   userId: string;
+  accept?: string; // file picker filter
+  allowFile?: (f: File) => boolean; // files failing this are refused with fileRule
+  fileRule?: string;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -21,7 +24,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   onSendMessage,
   onSendFiles,
   userId,
-  status
+  status,
+  accept,
+  allowFile,
+  fileRule,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +61,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
               seen={msg.seen_by_user === 1 || msg.seen === true}
               attachments={msg.attachments}
               userId={userId}
+              senderRole={msg.sender_role}
             />
           ))
         ) : (
@@ -76,6 +83,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             onSendMessage={onSendMessage}
             onSendFiles={onSendFiles}
             isSending={isSending}
+            accept={accept}
+            allowFile={allowFile}
+            fileRule={fileRule}
           />
         )}
       </div>

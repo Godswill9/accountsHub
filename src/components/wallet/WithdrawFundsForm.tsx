@@ -102,7 +102,7 @@ const form = useForm<z.infer<typeof schema>>({
 
   try {
     setBankCheckLoading(true);
-    const res = await axios.post("https://aitool.asoroautomotive.com/api/flutterwave/checkBankDet", {
+    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/flutterwave/checkBankDet`, {
       bank_code: bankCode,
       account_number: accountNumber,
     }, {withCredentials:true});
@@ -144,7 +144,7 @@ const form = useForm<z.infer<typeof schema>>({
       setIsSubmitting(true);
 
       const response = await axios.post(
-        `https://aitool.asoroautomotive.com/api/flutterwave/withdraw/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/flutterwave/withdraw/${userId}`,
         {
           method,
           details,
@@ -194,7 +194,7 @@ const form = useForm<z.infer<typeof schema>>({
       setIsSubmitting(true);
 
       const response = await axios.post(
-        `https://aitool.asoroautomotive.com/api/withdraw/paypal/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/withdraw/paypal/${userId}`,
         {
           method,
           details,
@@ -243,7 +243,7 @@ const form = useForm<z.infer<typeof schema>>({
       setIsSubmitting(true);
 
       const response = await axios.post(
-        `https://aitool.asoroautomotive.com/api/withdraw/payoneer/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/withdraw/payoneer/${userId}`,
         {
           method,
           details,
@@ -294,7 +294,7 @@ const details = {
       setIsSubmitting(true);
 
       const response = await axios.post(
-        `https://aitool.asoroautomotive.com/api/withdraw/crypto/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/withdraw/crypto/${userId}`,
         {
           method,
           details,

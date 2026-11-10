@@ -7,14 +7,8 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,
-    proxy: {
-      '/api': {
-        target: 'https://aitool.asoroautomotive.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      },
-    },
+    port: 8082, // buyer site; other apps and the backend link here
+    strictPort: true,
   },
   plugins: [
     react(),

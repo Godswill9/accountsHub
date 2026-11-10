@@ -1,55 +1,42 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Wallet } from "lucide-react";
 import { authService } from "@/services/authService";
+import { live } from "@/lib/live";
 
+// Header button showing the buyer's wallet balance (kept fresh in the background); click opens the wallet.
 const WalletButton: React.FC = () => {
   const navigate = useNavigate();
   const [balance, setBalance] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        setIsLoading(true);
         const user = await authService.verifyUser();
-        
-        // Uncomment and implement this when wallet service is ready
-        // if (user && user.id) {
-        //   const walletData = await getWalletBalance(user.id);
-        //   if (walletData) {
-        //     setBalance(walletData.balance);
-        //   }
-        // }
-      } catch (error) {
-        console.error("Failed to fetch wallet balance:", error);
-      } finally {
-        setIsLoading(false);
+        if (user && user.wallet_balance !== undefined && user.wallet_balance !== null) {
+          setBalance(Number(user.wallet_balance));
+        }
+      } catch {
+        // not logged in or offline: keep the last value / "My Wallet"
       }
     };
-
     fetchBalance();
+    return live(fetchBalance, 15000);
   }, []);
-
-  const handleWalletAccess = () => {
-    navigate("/wallet");
-  };
 
   return (
     <Button
       variant="ghost"
       size="sm"
-      className="flex items-center text-blue-600 hover:text-blue-800"
-      onClick={handleWalletAccess}
+      className="flex items-center text-blue-600 hover:text-blue-800 font-semibold"
+      onClick={() => navigate("/wallet")}
+      aria-label={balance !== null ? `Wallet balance ${balance.toFixed(2)} US dollars` : "My wallet"}
     >
       <Wallet className="h-4 w-4 mr-1" />
-      <span className="hidden sm:inline">
-        {isLoading
-          ? "Loading..."
-          : balance !== null
-          ? `$${balance.toFixed(2)}`
+      <span>
+        {balance !== null
+          ? balance.toLocaleString("en-US", { style: "currency", currency: "USD" })
           : "My Wallet"}
       </span>
     </Button>

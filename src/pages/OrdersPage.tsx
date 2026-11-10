@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { live } from "@/lib/live";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -51,6 +52,7 @@ const OrdersPage: React.FC = () => {
     };
 
     checkAuthStatus();
+    return live(checkAuthStatus, 10000);
   }, []);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ setOrders(sortedOrders);
     const fetchMessages= async(sellerId: string)=>{
        try {
         const res = await axios.get(
-          `https://aitool.asoroautomotive.com/api/conversations/${sellerId}`, {withCredentials:true}
+          `${import.meta.env.VITE_API_BASE_URL}/conversations/${sellerId}`, {withCredentials:true}
         );
        
         return res.data.conversations
@@ -96,7 +98,7 @@ setOrders(sortedOrders);
   const fetchMessagesFromId = async (orderId: string) => {
   try {
     const res = await axios.get(
-      `https://aitool.asoroautomotive.com/api/${orderId}`, {withCredentials:true}
+      `${import.meta.env.VITE_API_BASE_URL}/${orderId}`, {withCredentials:true}
     );
 
     const unseenFromSeller = res.data.filter(

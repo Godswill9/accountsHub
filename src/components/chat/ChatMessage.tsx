@@ -13,6 +13,7 @@ interface ChatMessageProps {
   seen_by_user?: number;
   attachments?: string[];
   userId?: string; // Optional userId prop for future use
+  senderRole?: string; // order chats: "buyer" | "seller" | "admin"
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -23,9 +24,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   seen,
   seen_by_user,
   attachments = [],
-  userId
+  userId,
+  senderRole
 }) => {
  const isUser = sender === userId;
+ const who = isUser ? "You" : senderRole === "seller" ? "Seller" : senderRole === "buyer" ? "Buyer" : "AccountsHub";
   const messageTime = timestamp || time_received;
   const isMessageSeen =
     seen !== undefined
@@ -46,7 +49,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   const fetchImage = async (link: string): Promise<string | undefined> => {
     try {
       const response = await fetch(
-        `https://aitool.asoroautomotive.com/api/${link}`,
+        `${import.meta.env.VITE_API_BASE_URL}/${link}`,
         {
           method: "GET",
           credentials: "include",
@@ -109,6 +112,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           title="New message"
         ></div>
       )}
+      <span className={cn("text-xs font-semibold mb-1", isUser ? "text-blue-200" : "text-gray-500")}>{who}</span>
 
       {content.startsWith("get-image") ? (
         (() => {

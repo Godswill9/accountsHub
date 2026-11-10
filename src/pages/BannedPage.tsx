@@ -5,7 +5,7 @@ export default function BannedPage() {
     <div className="h-screen w-full flex flex-col items-center justify-center text-center bg-red-50 text-red-800 px-4">
       {/* Logo */}
       <img
-        src="https://accountshub.onrender.com/lovable-uploads/b8bc2363-f8b3-49a4-bec6-1490e3aa106a-removebg-preview.png"
+        src="/logo.png"
         alt="AccountsHub Logo"
         className="h-24 mb-6"
       />

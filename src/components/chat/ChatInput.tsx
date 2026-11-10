@@ -4,18 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Paperclip, Send, X } from "lucide-react";
 import { getFileIcon } from "@/utils/fileHelpers";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 // import { useAuth } from "@/contexts/AuthContext";
 
 interface ChatInputProps {
   onSendMessage: (content: string) => Promise<void>;
   onSendFiles: (content: string, files: File[]) => Promise<void>;
   isSending: boolean;
+  accept?: string; // file picker filter
+  allowFile?: (f: File) => boolean; // files failing this are refused with fileRule
+  fileRule?: string;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
   onSendMessage,
   onSendFiles,
   isSending,
+  accept,
+  allowFile,
+  fileRule,
 }) => {
   const [message, setMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -45,8 +52,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
+      const picked = Array.from(e.target.files);
+      const filesArray = allowFile ? picked.filter(allowFile) : picked;
+      if (filesArray.length < picked.length) toast.error(fileRule || "That file type can't be sent here.");
       setSelectedFiles((prev) => [...prev, ...filesArray]);
+      e.target.value = "";
     }
   };
 
@@ -92,7 +102,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           variant="ghost"
           size="icon"
           onClick={handleAttachClick}
-          className="flex-shrink-0 text-gray-500 hover:text-indigo-600"
+          className="flex-shrink-0 text-gray-500 hover:text-brand-600"
           disabled={isSending}
         >
           <Paperclip className="h-5 w-5" />
@@ -122,6 +132,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <input
           type="file"
           ref={fileInputRef}
+          accept={accept}
           onChange={handleFileChange}
           className="hidden"
           multiple

@@ -1,14 +1,12 @@
-
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
-import FeatureCards from '@/components/FeatureCards';
-import BusinessList from '@/components/BusinessList';
 import Footer from '@/components/Footer';
+import { PopularListings, HowItWorks, WhyUs, Faq, SellerCta } from '@/components/HomeSections';
 
 const Index = () => {
   useEffect(() => {
-    document.title = "Accounts Hub - Accounts store";
+    document.title = "AccountsHub - Store";
   }, []);
 
   return (
@@ -16,8 +14,11 @@ const Index = () => {
       <Header />
       <main className="flex-grow">
         <Hero />
-        <FeatureCards />
-        <BusinessList />
+        <PopularListings />
+        <HowItWorks />
+        <WhyUs />
+        <Faq />
+        <SellerCta />
       </main>
       <Footer />
     </div>

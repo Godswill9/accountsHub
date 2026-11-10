@@ -15,6 +15,7 @@ important_notice: string;
 images?: string[];
 seller_id: string;
 data_format?:string
+specs?: { followers: string; account_age: string; country: string; niche: string; monetized: boolean } | null;
 }
 
 export const DIGITAL_PRODUCTS_ENDPOINTS = {

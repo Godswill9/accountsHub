@@ -17,14 +17,14 @@ const VerifyPaymentPage = () => {
     
 useEffect(() => {
   const verifyPayment = async () => {
-    localStorage.setItem("transactionId", transactionId)
     try {
-      const res = await fetch(`https://aitool.asoroautomotive.com/api/flutterwave/verify?transaction_id=${transactionId}`, {credentials:"include"});
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/flutterwave/verify?transaction_id=${transactionId}`, {credentials:"include"});
       const data = await res.json();
 
       if (data.status === "success") {
         const queryParams = new URLSearchParams({
           tx_ref: data.data.tx_ref,
+          credited: String(data.data.credited_usd ?? ""),
         //   amount: data.data.amount,
         //   currency: data.data.currency,
         }).toString();

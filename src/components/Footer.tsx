@@ -38,7 +38,7 @@ const Footer = () => {
               Ready to cash out? Create a seller account and list your digital asset in minutes.
             </p>
             <Button variant="default" className="text-sm font-medium px-4 py-2" asChild>
-              <a href="https://accountshubsellers.onrender.com/" className="flex items-center gap-2">
+              <a href={import.meta.env.VITE_SELLER_URL} className="flex items-center gap-2">
                 Start Selling <ChevronRight size={16} />
               </a>
             </Button>
